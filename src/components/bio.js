@@ -37,9 +37,18 @@ function Bio() {
                 borderRadius: `50%`,
               }}
             />
-            <p>
-              Hello there.
-            </p>
+            <div>
+              <p
+                style={{
+                  marginBottom: 0
+                }}
+              >
+                Personal blog by <a href={`https://twitter.com/${social.twitter}`}>Ju Liu</a>.
+              </p>
+              <p>
+                I try to write code that doesn't suck.
+              </p>
+            </div>
           </div>
         )
       }}
