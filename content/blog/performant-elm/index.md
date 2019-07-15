@@ -105,7 +105,7 @@ sameToken ( _, char1 ) ( _, char2 ) =
     not (isSpace char1) && not (isSpace char2)
 ```
 
-into
+into something that looks like this
 
 ```elm
 -- This is a very hot path in the code. So we build a set once
@@ -120,7 +120,7 @@ sameToken ( _, char1 ) ( _, char2 ) =
 ```
 
 With this little change in place, we can repeat the performance
-measurement and see this
+measurement
 
 ![Append Child](./append-child.png)
 
