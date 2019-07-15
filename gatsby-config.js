@@ -1,6 +1,6 @@
 module.exports = {
   siteMetadata: {
-    title: `Ju Liu`,
+    title: `juliu.is`,
     author: `Ju Liu`,
     description: `A blog.`,
     siteUrl: `https://juliu.is`,
@@ -42,17 +42,12 @@ module.exports = {
           `gatsby-remark-prismjs`,
           `gatsby-remark-copy-linked-files`,
           `gatsby-remark-smartypants`,
+          `gatsby-remark-reading-time`,
         ],
       },
     },
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
-    {
-      resolve: `gatsby-plugin-google-analytics`,
-      options: {
-        //trackingId: `ADD YOUR TRACKING ID HERE`,
-      },
-    },
     `gatsby-plugin-feed`,
     {
       resolve: `gatsby-plugin-manifest`,
