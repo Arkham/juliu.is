@@ -3,7 +3,7 @@ module.exports = {
     title: `Ju Liu`,
     author: `Ju Liu`,
     description: `A blog.`,
-    siteUrl: `https://ju-liu.netlify.com/`,
+    siteUrl: `https://juliu.is`,
     social: {
       twitter: `arkh4m`,
     },
@@ -57,13 +57,13 @@ module.exports = {
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
-        name: `Gatsby Starter Blog`,
-        short_name: `GatsbyJS`,
+        name: `juliu.is`,
+        short_name: `juliu.is`,
         start_url: `/`,
         background_color: `#ffffff`,
         theme_color: `#663399`,
         display: `minimal-ui`,
-        icon: `content/assets/gatsby-icon.png`,
+        icon: `content/assets/icon.png`,
       },
     },
     `gatsby-plugin-offline`,
