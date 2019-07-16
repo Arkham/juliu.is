@@ -33,7 +33,7 @@ purple parts denote the time it took to render. You can also see small red
 corners scattered through the graph: those represent when the user has
 experienced noticeable delays while using the application. You can find out
 more information about what it means
-[here](https://developers.google.com/web/fundamentals/performance/rail#goals-and-guidelines).
+[here](https://developers.google.com/web/fundamentals/performance/rail#goals-and-guidelines "Measure Performance with the RAIL Model").
 
 You'll also notice you can select a smaller time interval and start digging
 into more specific bits of what your application is doing at a certain
@@ -87,7 +87,6 @@ isSpace char =
         ]
 ```
 
-
 Uh! That is really surprising. Usually iterating over a list is really
 fast, but in this case it seems that we are spending almost 90% of our
 time inside this function. As you probably know, the algorithmic complexity
@@ -127,7 +126,7 @@ measurement
 Now our browser is spending most of its time adding elements to the DOM
 instead of just comparing things and we notice an extreme performance
 speedup when using the application. Albeit this is still not optimal, it's
-a __huge__ improvement with a very small code change.
+a **huge** improvement with a very small code change.
 
 I hope that after reading this you will be less intimidated to dive in
 performance measurements and getting the most out of your browser

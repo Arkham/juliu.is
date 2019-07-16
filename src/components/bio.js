@@ -40,14 +40,13 @@ function Bio() {
             <div>
               <p
                 style={{
-                  marginBottom: 0
+                  marginBottom: 0,
                 }}
               >
-                Personal blog by <a href={`https://twitter.com/${social.twitter}`}>Ju Liu</a>.
+                Personal blog by{" "}
+                <a href={`https://twitter.com/${social.twitter}`}>Ju Liu</a>.
               </p>
-              <p>
-                I try to write code that doesn't suck.
-              </p>
+              <p>{`I try to write code that doesn't suck.`}</p>
             </div>
           </div>
         )
