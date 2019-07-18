@@ -14,9 +14,8 @@ fast. Okay. Let's try to stay calm.
 
 The app looks fast at a first glance. To be fair, you're probably using a
 quad-core machine with 16 GB of RAM. Maybe you should see how the app
-behaves on a lower end device. In Chrome, you can bring up the inspector,
-then go to Performance tab and choose how much you want to throttle your
-CPU.
+behaves on a lower end device. In Chrome, you bring up the inspector, then
+go to Performance tab and choose how much you want to throttle your CPU.
 
 ![Chrome CPU Throttling](./chrome-throttling.png)
 
@@ -27,12 +26,14 @@ all is done, you should see something like this.
 
 ![Chrome Performance](./chrome-performance.png)
 
-That looks quite exotic, but let's not lose hope. The yellow parts of the
-graph represent the time your browser spent executing scripts, while the
-purple parts denote the time it took to render. You can also see small red
-corners scattered through the graph: those represent when the user has
-experienced noticeable delays while using the application. You can find out
-more information about what it means
+That looks quite exotic, but let's not lose hope. The <span
+style="background-color: #f3d07c;">yellow parts</span> of the graph
+represent the time your browser spent executing scripts, while the <span
+style="background-color: #ae99eb;">purple parts</span> denote the time it
+took to render. You can also see small red corners scattered through the
+graph: those represent when the user has experienced noticeable delays
+while using the application. You can find out more information about what
+it means
 [here](https://developers.google.com/web/fundamentals/performance/rail#goals-and-guidelines "Measure Performance with the RAIL Model").
 
 You'll also notice you can select a smaller time interval and start digging
@@ -124,12 +125,17 @@ measurement
 ![Append Child](./append-child.png)
 
 Now our browser is spending most of its time adding elements to the DOM
-instead of just comparing things and we notice an extreme performance
-speedup when using the application. Albeit this is still not optimal, it's
-a **huge** improvement with a very small code change.
+instead of just comparing things. We can also notice that there is no huge
+outlier anymore: the current top function, `appendChild`, uses 15% of the
+total time while previously `_Utils_eqHelp` was taking almost 90% of the
+total time. When we try clicking around the application, we notice an
+extreme performance speedup when using the application. Albeit this is
+still not optimal, it's a **huge** improvement with a very small code
+change. Look at the how the shape of the performance graph has changed:
+
+![Before After](./before-after.gif)
 
 I hope that after reading this you will be less intimidated to dive in
-performance measurements and getting the most out of your browser
-inspector. In future blog posts we will explore what else we can do to make
-our Elm applications faster, in particular using `Html.Keyed` and
-`Html.Lazy`.
+performance measurements and get the most out of your browser inspector. In
+future blog posts we will explore what else we can do to make our Elm
+applications faster, in particular using `Html.Keyed` and `Html.Lazy`.
