@@ -1,9 +1,9 @@
 module.exports = {
   siteMetadata: {
-    title: `Ju Liu`,
+    title: `juliu.is`,
     author: `Ju Liu`,
     description: `A blog.`,
-    siteUrl: `https://ju-liu.netlify.com/`,
+    siteUrl: `https://juliu.is`,
     social: {
       twitter: `arkh4m`,
     },
@@ -31,6 +31,7 @@ module.exports = {
             resolve: `gatsby-remark-images`,
             options: {
               maxWidth: 590,
+              linkImagesToOriginal: false,
             },
           },
           {
@@ -42,28 +43,22 @@ module.exports = {
           `gatsby-remark-prismjs`,
           `gatsby-remark-copy-linked-files`,
           `gatsby-remark-smartypants`,
+          `gatsby-remark-reading-time`,
         ],
       },
     },
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
     {
-      resolve: `gatsby-plugin-google-analytics`,
-      options: {
-        //trackingId: `ADD YOUR TRACKING ID HERE`,
-      },
-    },
-    `gatsby-plugin-feed`,
-    {
       resolve: `gatsby-plugin-manifest`,
       options: {
-        name: `Gatsby Starter Blog`,
-        short_name: `GatsbyJS`,
+        name: `juliu.is`,
+        short_name: `juliu.is`,
         start_url: `/`,
         background_color: `#ffffff`,
         theme_color: `#663399`,
         display: `minimal-ui`,
-        icon: `content/assets/gatsby-icon.png`,
+        icon: `content/assets/icon.png`,
       },
     },
     `gatsby-plugin-offline`,
