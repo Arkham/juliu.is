@@ -131,7 +131,7 @@ total time while previously `_Utils_eqHelp` was taking almost 90% of the
 total time. When we try clicking around the application, we notice an
 extreme performance speedup when using the application. Albeit this is
 still not optimal, it's a **huge** improvement with a very small code
-change. Look at the how the shape of the performance graph has changed:
+change. Look at how the shape of the performance graph has changed:
 
 ![Before After](./before-after.gif)
 
