@@ -1,7 +1,7 @@
 ---
 title: Performant Elm, Part II, Html Keyed
 date: "2019-10-07T12:00:00.000Z"
-description: Understand how Html Keyed works and how to use it
+description: Understand how Html Keyed works and how to use it.
 ---
 
 This is the second post in a series which explores optimization techniques
@@ -87,7 +87,7 @@ at the end. If you zoom in, you will see that the root function
 
 ## Introducing Html.Keyed
 
-Now let's replace the current rendering logic with Html.Keyed. We'll
+Now let's replace the current rendering logic with `Html.Keyed`. We'll
 replace this line of code:
 
 ```elm
