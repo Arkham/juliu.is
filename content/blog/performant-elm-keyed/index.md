@@ -1,7 +1,7 @@
 ---
-title: Performant Elm, Part II, Html Keyed
+title: Performant Elm, Part II, Html.Keyed
 date: "2019-10-07T12:00:00.000Z"
-description: Understand how Html Keyed works and how to use it.
+description: Understand how Html.Keyed works and how to use it.
 ---
 
 This is the second post in a series which explores optimization techniques
@@ -31,7 +31,7 @@ So first of all I would recommend reading [the first post in this
 series](../performant-elm), which shows you how to use your browser
 profiling tools to perform repeatable measurements.
 
-## What is Html Keyed
+## What is Html.Keyed
 
 The wonderful [Elm
 Guide](https://guide.elm-lang.org/optimization/keyed.html) tells us that
@@ -57,9 +57,9 @@ nodes have to be compared.
 
 Let's unleash our inner Doubting Thomas and test out these assumptions. In
 most UNIX systems there is a dictionary of words in
-`/usr/share/dict/words`, so I've copied more or less 3000 of those and
-wrote a <a href="https://ellie-app.com/6RtqCZC7Bzva1" target="_blank">small
-Ellie app</a> to display them. It looks something like this:
+`/usr/share/dict/words`, so I've taken some of those and wrote a <a
+href="https://ellie-app.com/6VDSqp2zqrYa1" target="_blank">small Ellie
+app</a> to display them. It looks something like this:
 
 ![Ellie example](./ellie-example.png)
 
@@ -72,7 +72,7 @@ If we record a performance readout of this example, this is what we'll see:
 
 ![Performance before](./before.png)
 
-Let's break down the graph:
+Let's break down the graph (you can click on the image to see more details):
 
 - From the moment we click the button, we spend around 1000ms in scripting
 - Then follows 250ms of style recalculation
@@ -83,7 +83,9 @@ What I would like to focus on is the **right hand side** of the scripting
 portion: you can see that there are a lot of small function calls happening
 at the end. If you zoom in, you will see that the root function
 `_VirtualDom_applyPatches` has instantiated many thousands of times
-`_VirtualDom_applyPatchesHelp`.
+`_VirtualDom_applyPatchesHelp`. You can also see this in the "Bottom-Up" view:
+
+![Zoomed in](./zoomed.png)
 
 ## Introducing Html.Keyed
 
@@ -110,7 +112,9 @@ viewKeyedEntry entry =
     ( String.fromInt entry.id, viewEntry entry )
 ```
 
-You can play around with the <a href="https://ellie-app.com/6RtDQcTkV6ba1" target="_blank">new Ellie app</a>. Now let's make another performance measurement!
+You can play around with the <a href="https://ellie-app.com/6VDSnNwFcKTa1"
+target="_blank">new Ellie app</a>. Now let's make another performance
+measurement!
 
 ![Performance after](./after.png)
 
@@ -122,30 +126,38 @@ somewhere else.
 
 But if we zoom in the scripting section we'll see an interesting change.
 First of all, it's clear that our browser has been less busy: the usage
-pattern is way less fragmented. And if we take a look at the call stack we
-can see that now `_VirtualDom_applyPatches` calls
-`_VirtualDom_applyPatchesHelp` only once!
+pattern is way less fragmented. When we look at the call stack,
+`_VirtualDom_applyPatches` now calls `_VirtualDom_applyPatchesHelp` only
+**once**! This is even more evident in the "Bottom-Up" view:
+
+![Zoomed in after](./zoomed-after.png)
+
+We've made the code twice as fast 🤟
 
 ## One More Thing
 
 So far we have seen the benefits of `Html.Keyed` as far as it concerns
 performance. But another great use case of this library is **UI consistency**.
-Imagine we wanted to add a little checkbox near each word. Now if I checked
-a word and then changed the sorting order, I would expect the checked box
-to follow the word.
 
-Right? Wrong! <a href="https://ellie-app.com/6RvJ6VRyFRsa1" target="_blank">See for yourself</a>.
+Let's go back to the original version without `Html.Keyed` and add a little
+checkbox near each word. Now if I checked a word and then changed the
+sorting order, I would expect the checked box to follow the word.
+
+Right? Wrong! <a href="https://ellie-app.com/6VDZZNkyfXca1" target="_blank">See for yourself</a>.
 
 ![Oopsie](./oopsie.gif)
 
 This happens because the virtual DOM diffing doesn't really understand that
 the checkboxes _belong_ to each word, and therefore decides that the best
-action to take is just to leave them there.
+action to take is just to leave them there. Note that this happens because
+we are using the DOM to store the state of our checkboxes, so Elm has no
+knowledge that we care about those values.
 
-By using `Html.Keyed` we communicate our intention that these elements
-belong to the same unit and therefore need to be considered as a whole.
-Check out the <a href="https://ellie-app.com/6RvNwJfQdMna1"
-target="_blank">updated version</a>.
+If we apply the `Html.Keyed` change again by replacing `viewEntry` with
+`viewKeyedEntry`, we communicate our intention that these elements belong
+to the same unit and therefore need to be considered as a whole. Check out
+the <a href="https://ellie-app.com/6RvNwJfQdMna1" target="_blank">updated
+version</a>.
 
 ![Fixed](./fixed.gif)
 
