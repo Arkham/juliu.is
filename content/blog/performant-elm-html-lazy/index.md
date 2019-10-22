@@ -146,7 +146,26 @@ as it seems. If you have ever tried to use `Html.Lazy` and failed to see
 any improvements, you know how frustrating it can be. So I'm going to list
 some common reasons on why it might not be working.
 
-### Reference Equality
+### Using anonymous functions
+
+A very simple way to break `Html.Lazy` is to replace this line:
+
+```elm
+[ Html.Lazy.lazy viewPrime 200000 ]
+```
+
+with this:
+
+```elm
+[ Html.Lazy.lazy (\n -> viewPrime n) 200000 ]
+```
+
+You can check it out [here](https://ellie-app.com/6YN5kPtX5N3a1). Why is
+that? Because `Html.Lazy` needs to associate the cached value with a
+precise function, but specifying an anonymous function forces the runtime
+to recreate that function every time the `view` is invoked.
+
+### Reference equality
 
 The Elm Guide has this very interesting section:
 
@@ -166,26 +185,44 @@ to take a list of integers:
 
 ```elm
 viewPrime : List Int -> Html Msg
-viewPrime list =
+viewPrime limits =
     let
-        limit =
-            List.head list
-                |> Maybe.withDefault 10
+        line limit =
+            div []
+                [ text
+                    ("There are "
+                        ++ String.fromInt (sieve limit |> List.length)
+                        ++ " prime numbers between between 2 and "
+                        ++ String.fromInt limit
+                    )
+                ]
     in
-    text
-        ("There are "
-            ++ String.fromInt (sieve limit |> List.length)
-            ++ " prime numbers between between 2 and "
-            ++ String.fromInt limit
-        )
+    div [] (List.map line limits)
 ```
 
-When you click on the toggle [now](https://ellie-app.com/6YNczcgYpnCa1),
+When you click on the toggle [now](https://ellie-app.com/6Z879Gzs4Q5a1),
 you'll see that we're back to being slow.
+
+So what can we do when we need to use a record, a list, a dictionary or a
+custom type as a **thing** to pass to `lazy`?
+
+The easiest solution is to store it inside our `Model`:
+
+```elm
+type alias Model =
+    { color: Color
+    , limits: List Int
+    }
+```
+
+Now the reference won't change as long as we don't change our model. Check
+out the updated version [here](https://ellie-app.com/6Z88XgCLBTpa1).
 
 ### Destructuring nested records
 
-A corollary of the previous example happens when we destructure nested records in our function arguments. So if we change our `Model` from:
+A corollary of the previous example happens when we destructure nested
+records in our function arguments. So if we change our `Model` from our
+original:
 
 ```elm
 type alias Model =
@@ -219,25 +256,6 @@ view { config } =
 ```
 
 You will see the app going back to [being slow again](https://ellie-app.com/6YMZ2H3mC7Ja1). This happens because when we destructure a nested record, we are creating a new reference, thus invalidating `Html.Lazy` caching mechanism.
-
-### Using anonymous functions
-
-A very simple way to break `Html.Lazy` is to replace this line:
-
-```elm
-[ Html.Lazy.lazy viewPrime 200000 ]
-```
-
-with this:
-
-```elm
-[ Html.Lazy.lazy (\n -> viewPrime n) 200000 ]
-```
-
-You can check it out [here](https://ellie-app.com/6YN5kPtX5N3a1). Why is
-that? Because `Html.Lazy` needs to associate the cached value with a
-precise function, but specifying an anonymous function forces the runtime
-to recreate that function every time the `view` is invoked.
 
 ## The End
 
