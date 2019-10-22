@@ -1,3 +1,8 @@
 .gatsby-highlight {
   margin-bottom: 1.75rem;
 }
+
+code[class*="language-"]::selection,
+code[class*="language-"] span::selection {
+  color: white;
+}
