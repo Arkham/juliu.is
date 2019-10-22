@@ -4,9 +4,9 @@ date: "2019-10-21T12:00:00.000Z"
 description: Being successful at being lazy.
 ---
 
-Hello wanderer! This is the third instalment of "How to make your Elm
-applications more performant". If you are into that kind of stuff, you can
-read about [how to tell what your browser is really
+Greetings traveler! This is the third instalment of a series on how to make
+your Elm applications more performant. If you are into this kind of stuff,
+you can read about [how to tell what your browser is really
 doing](../performant-elm) and [how Html.Keyed can help you help Elm to be
 faster](../performant-elm-html-keyed).
 
@@ -21,7 +21,7 @@ So [the Elm Guide](https://guide.elm-lang.org/optimization/lazy.html) does a fan
 lazy : (a -> Html msg) -> a -> Html msg
 ```
 
-As you can see, we pass two things:
+As you can see, we pass two arguments:
 
 - a **function that takes a thing**
 - a **thing**
@@ -221,15 +221,7 @@ out the updated version [here](https://ellie-app.com/6Z88XgCLBTpa1).
 ### Destructuring nested records
 
 A corollary of the previous example happens when we destructure nested
-records in our function arguments. So if we change our `Model` from our
-original:
-
-```elm
-type alias Model =
-    { color : Color }
-```
-
-to:
+records in our function arguments. So if we change our `Model` to:
 
 ```elm
 type alias Model =
@@ -255,12 +247,17 @@ view { config } =
         ]
 ```
 
-You will see the app going back to [being slow again](https://ellie-app.com/6YMZ2H3mC7Ja1). This happens because when we destructure a nested record, we are creating a new reference, thus invalidating `Html.Lazy` caching mechanism.
+You will see the app going back to [being slow
+again](https://ellie-app.com/6YMZ2H3mC7Ja1). This happens because when we
+destructure a nested record, we are creating a new reference of it, thus
+invalidating `Html.Lazy` caching mechanism. The solution once again is to
+refer to `model.config` instead of the destructured copy.
 
 ## The End
 
-Remember to always benchmark your application before and after adding
-`Html.Lazy`, so you can prove to your team lead that you have actually made
-the application faster 🤡
+Remember to always benchmark your application before and after `Html.Lazy`,
+so you can prove to your team lead that you have actually made the
+application faster 🤡
 
-This article concludes the series on writing performant Elm, thanks for reading!
+This article concludes the series on writing performant Elm, thanks for
+reading!
