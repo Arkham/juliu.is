@@ -15,7 +15,7 @@ about being lazy. I'm not talking "Oh I spent Sunday binge-watching Derry
 Girls" lazy, but more something like ["I got caught with 400kg of undelivered
 mail in my flat"](https://www.theguardian.com/world/2018/apr/06/former-postman-found-with-400kg-of-undelivered-mail-in-italy) sort of lazy.
 
-So [the Elm Guide](https://guide.elm-lang.org/optimization/lazy.html) does a fantastic job at explaining what `Html.Lazy` does. I really recomment going there and reading about it. Anyway, the main idea of it is this function:
+So [the Elm Guide](https://guide.elm-lang.org/optimization/lazy.html) does a fantastic job at explaining what `Html.Lazy` does. I really recommend going there and reading about it. Anyway, the main idea of it is this function:
 
 ```elm
 lazy : (a -> Html msg) -> a -> Html msg
