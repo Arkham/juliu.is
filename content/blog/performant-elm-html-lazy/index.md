@@ -113,10 +113,9 @@ viewPrime limit =
 ```
 
 You can notice there is a noticeable lag in the UI after pressing the
-"Toggle Color" button: this
-happens because after receiving the `ToggleColor` event, the Elm runtime
-needs to rerun the `view` function, which triggers again the sieve
-computation.
+"Toggle Color" button: this happens because after receiving the `Toggle`
+event, the Elm runtime needs to rerun the `view` function, which triggers
+again the sieve computation.
 
 ## Html.Lazy to the rescue
 
