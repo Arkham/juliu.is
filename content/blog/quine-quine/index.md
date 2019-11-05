@@ -146,7 +146,7 @@ a quine...
 
 When you're trying to write your own Quine, you'll get to a point when you
 think you've reached a solution, but end up having to compare two printouts
-which are not exactly human friendly. So you can use this bit of bash
+which are not exactly human friendly. So you can use this bit of Bash
 instead:
 
 ```bash
@@ -164,7 +164,7 @@ $ diff <(cat wrong.rb) <(ruby wrong.rb) && echo "IS QUINE"
 > puts src = " + src.inspect + src
 ```
 
-The weird looking `<()` is a bash feature called [process
+The weird looking `<()` is a Bash feature called [process
 substitution](http://tldp.org/LDP/abs/html/process-sub.html) that allows
 you to pass one command's output to another program as if it were a file
 name.
