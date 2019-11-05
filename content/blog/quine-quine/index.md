@@ -150,14 +150,14 @@ which are not exactly human friendly. So you can use this bit of Bash
 instead:
 
 ```bash
-$ diff <(cat quine.rb) <(ruby quine.rb) && echo "IS QUINE"
+$ diff quine.rb <(ruby quine.rb) && echo "IS QUINE"
 IS QUINE
 ```
 
 If you had make a mistake, it would print the diff like this:
 
 ```bash
-$ diff <(cat wrong.rb) <(ruby wrong.rb) && echo "IS QUINE"
+$ diff wrong.rb <(ruby wrong.rb) && echo "IS QUINE"
 2c2
 < puts "src = " + src.inspect + src
 ---
@@ -191,7 +191,7 @@ $ ghc quine.hs
 [1 of 1] Compiling Main             ( quine.hs, quine.o )
 Linking quine ...
 
-$ diff <(cat quine.hs) <(./quine) && echo "IS QUINE"
+$ diff quine.hs <(./quine) && echo "IS QUINE"
 IS QUINE
 ```
 
