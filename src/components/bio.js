@@ -21,7 +21,7 @@ function Bio() {
           <div
             style={{
               display: `flex`,
-              marginBottom: rhythm(2.5),
+              marginBottom: rhythm(1),
             }}
           >
             <Image
@@ -46,7 +46,11 @@ function Bio() {
                 Personal blog by{" "}
                 <a href={`https://twitter.com/${social.twitter}`}>Ju Liu</a>.
               </p>
-              <p>{`I try to write code that doesn't suck.`}</p>
+              <p
+                style={{
+                  marginBottom: 0,
+                }}
+              >{`I try to write code that doesn't suck.`}</p>
             </div>
           </div>
         )
