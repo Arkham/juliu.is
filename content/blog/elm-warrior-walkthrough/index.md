@@ -1,6 +1,6 @@
 ---
 title: A walkthrough of Elm Warrior
-date: "2020-07-06T12:00:00.000Z"
+date: "2020-08-26T12:00:00.000Z"
 description: Or how to build a simple AI that's slick and thick.
 ---
 
