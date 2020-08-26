@@ -740,28 +740,26 @@ And change our `takeTurn` function to pickup the item if we are standing on
 it:
 
 ```elm
-takeTurn : Warrior -> Map -> History -> Warrior.Action
-takeTurn warrior map history =
-    case
-        ( isEnemyNearby warrior map
-        , isWounded warrior
-        , Map.lookDown warrior map
-        )
-    of
-        ( False, True, _ ) ->
-            Warrior.Heal
+case
+    ( isEnemyNearby warrior map
+    , isWounded warrior
+    , Map.lookDown warrior map
+    )
+of
+    ( False, True, _ ) ->
+        Warrior.Heal
 
-        ( _, _, Item _ ) ->
-            Warrior.Pickup
+    ( _, _, Item _ ) ->
+        Warrior.Pickup
 
-        _ ->
-            allDirections
-                |> List.map (exploreDirection warrior map history)
-                |> List.sortWith
-                    (\( a, _ ) ( b, _ ) -> compareExploration a b)
-                |> List.head
-                |> Maybe.map Tuple.second
-                |> Maybe.withDefault Warrior.Wait
+    _ ->
+        allDirections
+            |> List.map (exploreDirection warrior map history)
+            |> List.sortWith
+                (\( a, _ ) ( b, _ ) -> compareExploration a b)
+            |> List.head
+            |> Maybe.map Tuple.second
+            |> Maybe.withDefault Warrior.Wait
 ```
 
 These changes will get us through [both levels ten and
