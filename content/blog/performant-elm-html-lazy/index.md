@@ -84,7 +84,7 @@ Now we can use this function to make our Elm code as slow as we want 🎉
 
 I have built a small Ellie app that calculates the number of prime numbers
 up to a certain limit, which you can find
-[here](https://ellie-app.com/6YMpjgQfjbCa1). Here's a GIF of the app in
+[here](https://ellie-app.com/bc2LYDftdQKa1). Here's a GIF of the app in
 action:
 
 ![Prime before](./before.gif)
@@ -131,7 +131,7 @@ to this:
 [ Html.Lazy.lazy viewPrime 200000 ]
 ```
 
-and we get [this result](https://ellie-app.com/6YMxPX265vva1):
+and we get [this result](https://ellie-app.com/bc2KLQMsYkYa1):
 
 ![Prime after](./after.gif)
 
@@ -225,7 +225,7 @@ viewPrime limits =
     div [] (List.map line limits)
 ```
 
-When you click on the toggle [now](https://ellie-app.com/6Z879Gzs4Q5a1),
+When you click on the toggle [now](https://ellie-app.com/bc2Rn9t8HKxa1),
 you'll see that we're back to being slow.
 
 So what can we do when we need to use a record, a list, a dictionary or a
