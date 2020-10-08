@@ -1,6 +1,6 @@
 ---
 title: A walkthrough of Elm Warrior
-date: "2020-08-26T12:00:00.000Z"
+date: "2020-10-09T12:00:00.000Z"
 description: Or how to build a simple AI that's slick and thick.
 ---
 
@@ -16,15 +16,22 @@ You (the warrior) are represented by the `@`. You always start on the blue
 tile and your goal is to reach the green tile. I thought it would be a cool
 idea to write down how to approach solving a problem like this.
 
-Before we start, a word of warning...
+Robin recently wrote a [great
+introduction](https://dev.to/robinheghan/getting-started-with-elm-warrior-5b2n)
+to how to play Elm Warrior and I wholeheartedly recommend reading it if
+you're just starting out.
+
+Before we begin, a word of warning...
 
 ## SPOILERS AHEAD!
 ## SPOILERS AHEAD!!
 ## SPOILERS AHEAD!!!
 
 Now that my conscience is clear, I'll start by copying the exposed values
-and functions from each top-level module and pasting them all together. No
-docs, no type signatures, nothing, just their **names**. As [the sage once
+and functions from [each top-level
+module](https://package.elm-lang.org/packages/Skinney/elm-warrior/latest/)
+and pasting them all together in one file. No docs, no type signatures,
+nothing, just their **names**. As [the sage once
 said](https://cs.fit.edu/~ryan/rose.html):
 
 > Stat rosa pristina nomine, nomina nuda tenemus.
@@ -77,12 +84,12 @@ module Warrior.Program exposing
 
 At this point we clearly don't understand what is going on with the code,
 but just by reading this listing a couple of times we are getting familiar
-with the _names_ of this particular domain. Just let it soak in.
+with the _names_ of this particular domain. Just let them soak in.
 
-Now I'm getting more curious and will take a look at these exposed data
-constructors: `Direction`, `Action`, and `Item`. Whenever a module exposes
-the inner contents of a type, that's an invitation to the world to depend
-on those values, so I'm sure it's going to be useful to take a peek.
+Now I'm getting a tad more curious and will take a look at these exposed
+data constructors: `Direction`, `Action`, and `Item`. Whenever a module
+exposes the inner contents of a type, that's an invitation to the world to
+depend on those values, so I know it's going to be useful to take a peek.
 
 ```elm
 type Direction
@@ -135,10 +142,15 @@ warrior move to the right. Let's import `Direction` and change the
 `takeTurn` function:
 
 ```elm
+import Warrior.Direction exposing (..)
+
 takeTurn : Warrior -> Map -> History -> Warrior.Action
 takeTurn warrior map history =
     Warrior.Move Right
 ```
+
+From now on I will provide Ellie links to each step, so don't worry about
+copying and pasting all the changes in the code.
 
 Onwards and upwards!
 
@@ -153,8 +165,7 @@ automatically teleported to the next level, which looks like this:
 Our warrior can only move right each step, and since the dungeon turns
 downwards, it gets stuck there. Poor fella.
 
-Now it's the time to look more in depth at a function inside the `Map`
-module:
+It's time to look more in depth at a function inside the `Map` module:
 
 ```elm
 {-| Provides a list of everything the warrior can see in a
@@ -176,7 +187,7 @@ type Tile
     | Item Item
 ```
 
-So the simplest way to pass this level is:
+The simplest way to pass this level is:
 
 - check if we can move right; if so, proceed
 - check if we can move down; if so, proceed.
@@ -318,7 +329,7 @@ Tada! 🎉
 
 ## Level IV
 
-So [here](https://ellie-app.com/9mqpJDnTq8ca1) is where we are now.
+We are [here](https://ellie-app.com/9mqpJDnTq8ca1) now.
 
 ![Elm warrior level four](./level-four.png)
 
@@ -327,7 +338,7 @@ just added some logic that makes the warrior skip tiles which have been
 visited in the past. In this case, we went down a path which turned out to
 be a dead end, so we **need to backtrack**.
 
-So instead of completely avoiding to step on a tile that has already been
+Instead of completely avoiding to step on a tile that has already been
 visited, we can think which are the possibilities when we want to explore
 the world in a certain direction. We can find:
 
@@ -336,10 +347,22 @@ the world in a certain direction. We can find:
 - an empty already visited tile
 - a wall tile
 
-So what we can do is to assign a value to each of these possibilities, so
-that we can choose the best available move every time. The great thing
-about Elm is how easy it is to create types for everything, so let's do
-that.
+What we can do is to assign a value to each of these possibilities, so
+that we can choose the best available move every time. One great thing
+about Elm is how easy it is to create types for everything:
+
+```elm
+type Exploration
+    = Freedom
+    | CanMoveUnvisited
+    | CanMoveVisited
+    | NoGo
+```
+
+As a matter of fact, we are very interested in how many times we have
+already visited a tile, because we can use that information to resolve ties
+when deciding which cells to visit. Let's change the type to reflect
+this:
 
 ```elm
 type Exploration
@@ -370,7 +393,7 @@ to define any other: `sort == sortWith compare`
 sortWith : (a -> a -> Order) -> List a -> List a
 ```
 
-So we need to provide our own comparison function...
+But we need to provide our own comparison function...
 
 ```elm
 compareExploration : Exploration -> Exploration -> Order
@@ -397,8 +420,7 @@ compareExploration first second =
 ```
 
 You will notice that better options have a "lower value": in this way when
-we're done sorting our list, the best option will be the head of the list
-;)
+we're done sorting our list, the best option will be the head of the list.
 
 Now all we have to do is to change `takeTurn` to explore each direction and
 choose the best option:
@@ -446,7 +468,7 @@ takeTurn warrior map history =
         |> Maybe.withDefault Warrior.Wait
 ```
 
-Now we can grab some popcorn and watch the progress...
+At this point we can grab some popcorn and watch the progress...
 
 ![Elm warrior progress till seven](./progress-till-seven.gif)
 
@@ -455,11 +477,11 @@ seven!
 
 ## Level VIII
 
-So [here](https://ellie-app.com/9w6xzNZz7BNa1) is where we are stuck now.
+We are stuck [here](https://ellie-app.com/9w6xzNZz7BNa1) now.
 
 ![Elm warrior level eight](./level-eight.png)
 
-We have met an enemy, exciting! We can add another option to `Exploration`:
+We have met an enemy, exciting! Let's add another option to `Exploration`:
 
 ```elm
 type Exploration
@@ -499,7 +521,7 @@ compareExploration first second =
                 GT
 ```
 
-Then, when we meet another warrior in our path, we can attack them :)
+Then, when we meet another warrior in our path we can attack them!
 
 ```elm
 exploreDirection dir =
@@ -647,23 +669,27 @@ isWounded warrior =
     Warrior.health warrior < Warrior.maxHealth warrior
 ```
 
-Now in our `exploreDirection` function, when we meet another warrior, we
-can check our fighting spirit:
+In our `exploreDirection` function, when we meet another warrior we
+can decide if we're in a fighting mood:
 
 ```elm
-( newCoords, Warrior _ ) :: _ ->
-    if isWounded warrior then
-        ( NoGo
-        , Warrior.Wait
-        )
+exploreDirection warrior map history dir =
+    case Map.look dir warrior map of
+        ( newCoords, Warrior _ ) :: _ ->
+            if isWounded warrior then
+                ( NoGo
+                , Warrior.Wait
+                )
 
-    else
-        ( Enemy
-        , Warrior.Attack dir
-        )
+            else
+                ( Enemy
+                , Warrior.Attack dir
+                )
+
+        -- loads of other case branches
 ```
 
-And in `takeTurn`:
+And inside `takeTurn`:
 
 ```elm
 takeTurn : Warrior -> Map -> History -> Warrior.Action
@@ -686,8 +712,8 @@ What happens now?
 ![Elm warrior pacifist](./pacifist.gif)
 
 Turns out that as soon as we move near the other warrior, we get attacked.
-Therefore, we immediately run away to heal, then try again. As much as I am
-a pacifist, we still need to find a way to pass this level.
+Therefore, we immediately run away to heal, then try again, then run away
+again. I'm a pacifist at heart, but still I'd like to pass this level.
 
 What's the solution this time? To endure a little bit of pain...
 
@@ -700,24 +726,28 @@ isBadlyWounded warrior =
     Warrior.health warrior < Warrior.maxHealth warrior // 4
 ```
 
-Now, we're going to replace the use of `isWounded` inside our
-`exploreDirection` function. We still want the original function inside
-`takeTurn` because we want to heal back to full health when we're safe.
+Now, we're going to replace `isWounded` inside `exploreDirection`.  We
+still want the original function inside `takeTurn` because we want to heal
+back to full health when we're safe.
 
 ```elm
-( newCoords, Warrior _ ) :: _ ->
-    if isBadlyWounded warrior then
-        ( NoGo
-        , Warrior.Wait
-        )
+exploreDirection warrior map history dir =
+    case Map.look dir warrior map of
+        ( newCoords, Warrior _ ) :: _ ->
+            if isBadlyWounded warrior then
+                ( NoGo
+                , Warrior.Wait
+                )
 
-    else
-        ( Enemy
-        , Warrior.Attack dir
-        )
+            else
+                ( Enemy
+                , Warrior.Attack dir
+                )
+
+        -- loads of other case branches
 ```
 
-Success!
+Victory! 🎊
 
 ## Level X
 
