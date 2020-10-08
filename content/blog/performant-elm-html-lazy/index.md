@@ -159,10 +159,36 @@ with this:
 [ Html.Lazy.lazy (\n -> viewPrime n) 200000 ]
 ```
 
-You can check it out [here](https://ellie-app.com/6YN5kPtX5N3a1). Why is
+You can check it out [here](https://ellie-app.com/bc2MVVJTLJwa1). Why is
 that? Because `Html.Lazy` needs to associate the cached value with a
 precise function, but specifying an anonymous function forces the runtime
 to recreate that function every time the `view` is invoked.
+
+### Constructing records on the fly
+
+A similar problem happens when we construct a record on the fly and pass it
+to `Html.Lazy`. Imagine our `viewPrime` looked like this:
+
+```elm
+viewPrime : { limit : Int } -> Html Msg
+viewPrime { limit } =
+    text
+        ("There are "
+            ++ String.fromInt (sieve limit |> List.length)
+            ++ " prime numbers between between 2 and "
+            ++ String.fromInt limit
+        )
+```
+
+And now we called it by writing:
+
+```elm
+[ Html.Lazy.lazy viewPrime { limit = 200000 } ]
+```
+
+You will see the app going back to [being slow
+again](https://ellie-app.com/bc2Q8mxQF8Ma1). This happens because when we
+build a new record we invalidate the caching mechanism of `Html.Lazy`.
 
 ### Reference equality
 
@@ -215,42 +241,7 @@ type alias Model =
 ```
 
 Now the reference won't change as long as we don't change our model. Check
-out the updated version [here](https://ellie-app.com/6Z88XgCLBTpa1).
-
-### Destructuring nested records
-
-A corollary of the previous example happens when we destructure nested
-records in our function arguments. So if we change our `Model` to:
-
-```elm
-type alias Model =
-    { config : Config }
-
-type alias Config =
-    { color: Color
-    , limit: Int
-    }
-```
-
-and make our `viewPrime` function take this new `Config` record like this:
-
-```elm
-view : Model -> Html Msg
-view { config } =
-    div []
-        [ button [ onClick Toggle ] [ text "Toggle color" ]
-        , div
-            [ -- style stuff
-            ]
-            [ Html.Lazy.lazy viewPrime config ]
-        ]
-```
-
-You will see the app going back to [being slow
-again](https://ellie-app.com/6YMZ2H3mC7Ja1). This happens because when we
-destructure a nested record, we are creating a new reference of it, thus
-invalidating `Html.Lazy` caching mechanism. The solution once again is to
-refer to `model.config` instead of the destructured copy.
+out the updated version [here](https://ellie-app.com/bc2RXrWn6fKa1).
 
 ## The End
 
