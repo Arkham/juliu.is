@@ -6,3 +6,11 @@ code[class*="language-"]::selection,
 code[class*="language-"] span::selection {
   color: white;
 }
+
+p + ul {
+  margin-top: -0.75rem;
+}
+
+ul li {
+  margin-bottom: calc(1.75rem / 3);
+}
