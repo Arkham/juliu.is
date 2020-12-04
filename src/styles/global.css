@@ -2,6 +2,10 @@
   margin-bottom: 1.75rem;
 }
 
+code {
+  font-family: Fira Code, Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace !important;
+}
+
 code[class*="language-"]::selection,
 code[class*="language-"] span::selection {
   color: white;
