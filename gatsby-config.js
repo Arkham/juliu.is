@@ -76,6 +76,7 @@ module.exports = {
           families: ['Fira Code']
         }
       }
-    }
+    },
+    `gatsby-plugin-feed`
   ],
 }
