@@ -254,8 +254,8 @@ After looking at the type signatures again we can say that these following
 functions are isomorphic:
 
 ```
-((a, b) -> c) -> a -> b
-(a -> b -> c) -> (a, b)
+((a, b) -> c) -> a -> b -> c
+(a -> b -> c) -> (a, b) -> c
 ```
 
 Pretty neat!
