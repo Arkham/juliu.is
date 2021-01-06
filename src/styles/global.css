@@ -3,7 +3,7 @@
 }
 
 code {
-  font-family: Fira Code, Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace !important;
+  font-family: Fira Mono, Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace !important;
 }
 
 code[class*="language-"]::selection,

@@ -1,13 +1,14 @@
 ---
 title: Permutate parsers, don't validate
-date: "2020-12-10T12:00:00.000Z"
+date: "2021-01-10T12:00:00.000Z"
 description: A practical example of “Parse, don't validate” in Haskell.
 ---
 
 ["Parse, don't
 validate"](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/)
 has been one of my favourite programming articles for some time. The main
-gist is that, when writing in a type-driven fashion, your snappy slogan should be:
+gist of the article is that, when writing in a type-driven fashion, your
+snappy slogan should be:
 
 > Parse, don't validate.
 
@@ -19,7 +20,7 @@ parseInt :: String -> Maybe Int
 parseInt str = Text.Read.readMaybe str
 
 validateInt :: String -> Bool
-validateInt str = parseInt str /= Nothing
+validateInt str = Text.Read.readMaybe str /= Nothing
 ```
 
 As you can see, they look very similar. The main difference is that
@@ -29,14 +30,18 @@ mentioned in the wonderful [Haskell Mini-Patterns
 Handbook](https://kowainik.github.io/posts/haskell-mini-patterns#evidence)
 as the "Evidence" pattern.
 
-> The key issue here is that by calling a function that returns Bool you lose the information about earlier performed validation. Instead, you can keep this information by explicitly pattern-matching on the validation or result.
+> The key issue here is that by calling a function that returns Bool you
+> lose the information about earlier performed validation. Instead, you can
+> keep this information by explicitly pattern-matching on the validation or
+> result.
 
-In this post, I would like to go through a practical example that shows the power
-of bringing this concept to its limits. Which brings us to...
+In this post, I would like to go through a practical example that shows the
+power of bringing this concept to its limits. Which brings us to...
 
 ## Advent of Code 2020, Day 4
 
-We [are tasked](https://adventofcode.com/2020/day/4) with parsing a batch of passports composed of these fields:
+We [are tasked](https://adventofcode.com/2020/day/4) with parsing a batch
+of passports composed of these fields:
 
 ```plain
 - byr (Birth Year)
@@ -49,7 +54,10 @@ We [are tasked](https://adventofcode.com/2020/day/4) with parsing a batch of pas
 - cid (Country ID)
 ```
 
-All the fields are required except for the `cid` field, which is optional. Our batch is composed of multiple passports separated by empty lines:
+All the fields are required except for the `cid` field, which is optional.
+Note that the fields can be written in any order, this will be important
+later. Our batch is composed of multiple passports separated by empty lines
+(our `input.txt`):
 
 ```plain
 ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
@@ -79,33 +87,28 @@ Let's write some code to open the file and parse each group of passport
 fields:
 
 ```haskell
-{-# LANGUAGE OverloadedStrings #-}
-
 module Main where
 
-import qualified Data.Text as T
-import qualified Data.Text.IO as TI
+import qualified Data.List.Split as S
 
 main :: IO ()
 main = do
-  contents <- TI.readFile "input.txt"
-  let entries = map parseEntry (T.splitOn "\n\n" contents)
+  contents <- readFile "input.txt"
+  let entries = map parseEntry (S.splitOn "\n\n" contents)
   print entries
 
 data PassportEntry = PassportEntry
   deriving (Show)
 
-parseEntry :: T.Text -> PassportEntry
+parseEntry :: String -> PassportEntry
 parseEntry text = undefined
 ```
 
-Here I've decided to use `Data.Text` to read the contents of the file and
-stubbed the implementation of `parseEntry` just to get the file to compile.
-I'm also using the `OverloadedStrings` language extension to be able to
-write `"hello"` and have Haskell infer that it's a `Text`.
-
+Nothing too fancy here, I'm using `Data.List.Split` from the `split`
+package to do the heavy lifting. And I've conveniently stubbed the
+implementation of `parseEntry` so that the code compiles.
 Now how should our `PassportEntry` data structure look like? I'd love to
-eventually represent passports as something like:
+eventually represent passports as:
 
 ```haskell
 data Passport = Passport
@@ -126,9 +129,10 @@ another data structure, then later convert them to our beautiful `Passport`
 representation.
 
 One way to store the fields is to insert them into a hash. First of all, I
-want to use a data type to represent the keys of the hash. Why is that? I
-really don't want to be making typos later when comparing `"ecl"` with `"elc"`.
-I'll use a `HashMap` from the `Data.HashMap.Strict` module:
+want to use a custom data type to represent the keys of the hash. Why is
+that? I really don't want to be making typos later when comparing raw
+strings like `"ecl"` and `"elc"`.  I'll use a `HashMap` from the
+`Data.HashMap.Strict` module:
 
 ```haskell
 import qualified Data.HashMap.Strict as HM
@@ -144,7 +148,7 @@ data PassportField
   | CountryId
   deriving (Eq, Show)
 
-type PassportEntry = HM.HashMap PassportField T.Text
+type PassportEntry = HM.HashMap PassportField String
 ```
 
 Of course things can't be that easy. We also need to make our type
@@ -170,26 +174,26 @@ data PassportField
 
 instance Hashable PassportField
 
-type PassportEntry = HM.HashMap PassportField T.Text
+type PassportEntry = HM.HashMap PassportField String
 ```
 
-Don't worry about any of that means. Just take it as a God-given truth.
+Don't worry about any of that means. Just take it as a God-given truth. 💖
 
 Okay, now we can implement our `parseEntry` function:
 
 ```haskell
 import Data.Maybe (mapMaybe)
-import Data.Char (isSpace)
+import qualified Data.Char as Char
 
-parseEntry :: T.Text -> PassportEntry
+parseEntry :: String -> PassportEntry
 parseEntry line =
   HM.fromList $
-    mapMaybe parseField $
-      T.split isSpace line
+    mapMaybe parseTag $
+      S.splitWhen Char.isSpace line
 
-parseField :: T.Text -> Maybe (PassportField, T.Text)
-parseField value =
-  case T.splitOn ":" value of
+parseTag :: String -> Maybe (PassportField, String)
+parseTag value =
+  case S.splitOn ":" value of
     ["byr", byr] ->
       Just (BirthYear, byr)
     ["iyr", iyr] ->
@@ -210,9 +214,9 @@ parseField value =
       Nothing
 ```
 
-We try to parse each `byr:2002` field into our `PassportField` type
-and end up building a hash using `HM.fromList`. We can take this for a
-spin in `ghci`:
+We try to parse each field (such as `byr:2002`) into our `PassportField`
+type, then end up building a hash using `HM.fromList`. We can take this for
+a spin:
 
 ```haskell
 Prelude> :l Main.hs
@@ -275,14 +279,12 @@ requiredFields =
   ]
 ```
 
-Then we can define a validation function:
+We can then define a validation function:
 
 ```haskell
 isEntryValid :: PassportEntry -> Bool
 isEntryValid entry =
-  all
-    (\field -> HM.member field entry)
-    requiredFields
+  all (`HM.member` entry) requiredFields
 ```
 
 And change our main function to use that:
@@ -290,13 +292,15 @@ And change our main function to use that:
 ```haskell
 main :: IO ()
 main = do
-  contents <- TI.readFile "short-input.txt"
-  let entries = map parseEntry (T.splitOn "\n\n" contents)
+  contents <- readFile "input.txt"
+  let entries = map parseEntry (S.splitOn "\n\n" contents)
   print $ length $ filter isEntryValid entries
 ```
 
 Running this yields `2`, which is the correct answer!
-[Here](https://gist.github.com/Arkham/4501df31f2a4f5eedef1c50fe01daeda) is all the code we have written so far, if you're feeling like you need a refresher.
+[Here](https://gist.github.com/Arkham/b749043e1622bf01c96eefe303df0b9b) is
+all the code we have written so far, if you're feeling like you need a
+refresher.
 
 ## Advent of Code 2020, Day 4, Part II
 
@@ -315,7 +319,7 @@ In the second part of the challenge, these new rules are added:
 - cid (Country ID) - ignored, missing or not.
 ```
 
-Here is a valid passport, followed by an invalid passport (look at `eyr`):
+Here is a new batch for us to peruse:
 
 ```plain
 pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980
@@ -325,28 +329,28 @@ eyr:1972 cid:100
 hcl:#18171d ecl:amb hgt:170 pid:186cm iyr:2018 byr:1926
 ```
 
-That's annoying. Our simple approach of checking if all required fields are
-present won't work any longer. I guess we can implement a `isFieldValid`
-function to check if all fields are valid.
+- the first passport is _valid_
+- the second passport is _invalid_ (look at the `eyr` field)
+
+These new requirements are a bit annoying. Our simple approach of checking
+if all required fields are present won't work any longer. We can instead
+implement a `isFieldValid` function to check if all fields are valid.
 
 ```haskell
-isFieldValid :: (PassportField, T.Text) -> Bool
+isFieldValid :: (PassportField, String) -> Bool
 isFieldValid (field, value) =
   case field of
     BirthYear ->
       let v = toInt value
-       in T.length value == 4 && v >= 1920 && v <= 2002
-
+       in length value == 4 && v >= 1920 && v <= 2002
     IssueYear ->
       let v = toInt value
-       in T.length value == 4 && v >= 2010 && v <= 2020
-
+       in length value == 4 && v >= 2010 && v <= 2020
     ExpirationYear ->
       let v = toInt value
-       in T.length value == 4 && v >= 2020 && v <= 2030
-
+       in length value == 4 && v >= 2020 && v <= 2030
     Height ->
-      case T.span isDigit value of
+      case span Char.isDigit value of
         (num, "cm") ->
           let n = toInt num
            in n >= 150 && n <= 193
@@ -355,32 +359,32 @@ isFieldValid (field, value) =
            in n >= 59 && n <= 76
         _ ->
           False
-
     HairColor ->
-      case (T.length value, T.unpack value) of
+      case (length value, value) of
         (7, '#' : rest) ->
           all (`elem` allowedHexChars) rest
         _ ->
           False
-
     EyeColor ->
-      value
-        `elem` ["amb","blu","brn","gry","grn","hzl","oth"]
-
+      value `elem` validEyeColors
     PassportId ->
-      T.length value == 9 && T.all isDigit value
-
+      length value == 9 && all Char.isDigit value
     CountryId ->
-      T.all isDigit value
-  where
-    toInt :: T.Text -> Int
-    toInt = read . T.unpack
+      all Char.isDigit value
 
-    allowedHexChars :: [Char]
-    allowedHexChars = ['0' .. '9'] <> ['a' .. 'f']
+toInt :: String -> Int
+toInt = read
+
+validEyeColors :: [String]
+validEyeColors =
+  ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]
+
+allowedHexChars :: [Char]
+allowedHexChars =
+  ['0' .. '9'] <> ['a' .. 'f']
 ```
 
-We can now change our `isEntryValid` to use this function:
+Then we can change our `isEntryValid` to use this function:
 
 ```haskell
 isEntryValid :: PassportEntry -> Bool
@@ -388,29 +392,28 @@ isEntryValid entry =
   requiredFieldsPresent && allFieldsValid
   where
     requiredFieldsPresent =
-      all
-        (\field -> HM.member field entry)
-        requiredFields
+      all (`HM.member` entry) requiredFields
 
     allFieldsValid =
-      all
-        isFieldValid
-        (HM.toList entry)
+      all isFieldValid (HM.toList entry)
 ```
 
-Running this program yields `1`, and it will be good enough to solve the
-Advent of Code challenge and get you those sweet sweet stars.
+Running this program on our second data sample yields `1`, and it will be
+good enough to solve the Advent of Code challenge and get you those sweet
+sweet stars.
 
 🎉 🎉 🎉
 
 ## A moment of reflection
 
 If we look back at the [current
-state](https://gist.github.com/Arkham/ba80dc39f5e1b7fe700287ee7bed1f2d) of our code, we can see that we are validating, validating, and validating.
+state](https://gist.github.com/Arkham/923df6e872d855101bca4261f7d71e65) of
+our code, we can see that we are doing a lot of validations.
 
 We do a lot of work to verify if something is valid, then throw it all out
 of the window to return a meagre `Bool`. German folks from the [sixteenth
-century](https://en.wikipedia.org/wiki/Don%27t_throw_the_baby_out_with_the_bathwater) would have told us:
+century](https://en.wikipedia.org/wiki/Don%27t_throw_the_baby_out_with_the_bathwater)
+would have told us snarkily:
 
 > das Kind mit dem Bade ausschütten
 
@@ -437,3 +440,375 @@ We'd like to write a `entryToPassport` function with this shape:
 ```haskell
 PassportEntry -> Maybe Passport
 ```
+
+Oh boy, we're really stuck now. We have a function to validate the fields,
+but that function doesn't give us a nice way to _extract_ that data and use
+it. We really did that work for nothing...
+
+One trick we could employ it to write a function like this:
+
+```haskell
+parseField ::
+  (PassportField, String) -> Maybe (PassportField, String)
+parseField tuple =
+  if isFieldValid tuple
+    then Just tuple
+    else Nothing
+```
+
+We are still reusing the validating logic, but we end up returning
+something useful instead. We are slowly migrating our code from validating
+data to parsing data!
+
+Using our new helper we can finally implement the `entryToPassport`
+function. We'll do that in two separate steps. First we'll get all the
+values of the required fields:
+
+```haskell
+getAllRequiredFields :: PassportEntry -> Maybe [String]
+getAllRequiredFields e =
+  traverse
+    ( \field -> do
+        v <- HM.lookup field e
+        (_field, text) <- parseField (field, v)
+        return text
+    )
+    requiredFields
+```
+
+The `traverse` magic ensures that we either get all the values we're
+looking for wrapped in a `Just`, or `Nothing` if any of those fields were
+invalid. Ok, we're ready to roll now!
+
+```haskell
+entryToPassport :: PassportEntry -> Maybe Passport
+entryToPassport entry = do
+  case getAllRequiredFields entry of
+    Just [byr, iyr, eyr, hgt, hcl, ecl, pid] ->
+      Just $
+        Passport
+          { birthYear = toInt byr,
+            issueYear = toInt iyr,
+            expirationYear = toInt eyr,
+            height = hgt,
+            hairColor = hcl,
+            eyeColor = ecl,
+            passportId = pid,
+            countryId = toInt <$> HM.lookup CountryId entry
+          }
+    _ ->
+      Nothing
+```
+
+This is far from ideal: we end up having to pass `String` values around,
+which need to be parsed again into the exact types that we desire. Also we
+need to pass these values into a list and hope not to mess up the ordering
+of the fields. So it's far from perfect, but we're getting somewhere.
+
+In order to use this function in our main, we replace the last line of the
+main fuction from:
+
+```haskell
+print $ length $ filter isEntryValid entries
+```
+
+to:
+
+```haskell
+print $ length $ mapMaybe entryToPassport entries
+```
+
+Running
+[this](https://gist.github.com/Arkham/22cb983c61f5a6aaf54227c94d0c7a6b) on
+our test batch still returns `1`, which is a good sign we haven't broken
+anything. Still, I'm unhappy we had to parse our data twice, so let's look
+at something new.
+
+## A new perspective
+
+We're going to write the same program using
+[parsec](https://hackage.haskell.org/package/parsec), a monadic parser
+combinator library. I've recently bumped
+into this excellent [walkthrough to parser
+combinators](https://hasura.io/blog/parser-combinators-walkthrough/), which
+I thouroughly recommend reading.
+
+In short a parser is a type like this one:
+
+```haskell
+type Parser a = Parser {
+  runParser :: String -> (String, Either ParseError a)
+}
+```
+
+It works by consuming input characters from the input string and returning
+a tuple with two values:
+
+1. The first value is what's left of the input string, so that other
+   parsers can keep parsing the rest of the input.
+2. The second value contains either a parse error or a properly parsed value of type `a`.
+
+
+We'll need to install `parsec` and add some imports:
+
+```haskell
+import qualified Text.Parsec as P
+import Text.Parsec.String (Parser)
+import Control.Monad (guard)
+```
+
+Now let's implement parsers for some fields:
+
+```haskell
+-- byr (Birth Year) - four digits; between 1920 and 2002.
+byrParser :: Parser Int
+byrParser = do
+  P.string "byr"
+  P.char ':'
+  value <- P.count 4 P.digit
+  P.spaces
+  let int = read value
+  guard (int >= 1920 && int <= 2002)
+  return int
+
+-- iyr (Issue Year) - four digits; between 2010 and 2020.
+iyrParser :: Parser Int
+iyrParser = do
+  P.string "iyr"
+  P.char ':'
+  value <- P.count 4 P.digit
+  P.spaces
+  let int = read value
+  guard (int >= 2010 && int <= 2020)
+  return int
+
+-- eyr (Expiration Year) - four digits; between 2020 and 2030.
+eyrParser :: Parser Int
+eyrParser = do
+  P.string "eyr"
+  P.char ':'
+  value <- P.count 4 P.digit
+  P.spaces
+  let int = read value
+  guard (int >= 2020 && int <= 2030)
+  return int
+```
+
+Here we use the `guard` function to introduce an assertion that will make
+the parser fail when the condition is not met. In general I feel that this
+code is quite readable, but we might want to extract a reusable helper to
+parse years:
+
+```haskell
+yearParser :: String -> (Int, Int) -> Parser Int
+yearParser value (rangeStart, rangeEnd) = do
+  P.string value
+  P.char ':'
+  value <- P.count 4 P.digit
+  P.spaces
+  let int = read value
+  guard (int >= rangeStart && int <= rangeEnd)
+  return int
+
+byrParser :: Parser Int
+byrParser = do
+  yearParser "byr" (1920, 2002)
+
+iyrParser :: Parser Int
+iyrParser = do
+  yearParser "iyr" (2010, 2020)
+
+eyrParser :: Parser Int
+eyrParser = do
+  yearParser "eyr" (2020, 2030)
+```
+
+🎉
+
+This is the beauty of writing parser combinators. They are **extremely** easy to
+reuse and combine.
+
+Now we want to write a parser for the height field. It might be nice to use
+a more specialized data type to represent that:
+
+```haskell
+data Height
+  = InCms Int
+  | InInches Int
+  deriving (Eq, Show)
+```
+
+Here we go!
+
+```haskell
+-- hgt (Height) - a number followed by either cm or in:
+-- If cm, the number must be between 150 and 193.
+-- If in, the number must be between 59 and 76.
+heightParser :: Parser Height
+heightParser = do
+  P.string "hgt"
+  P.char ':'
+  digits <- P.many1 P.digit
+  let value = read digits
+  result <- unitParser value
+  case result of
+    InCms _ ->
+      guard (value >= 150 && value <= 193)
+    InInches _ ->
+      guard (value >= 59 && value <= 76)
+  P.spaces
+  return result
+```
+
+What's that `unitParser` you ask?
+
+```haskell
+unitParser :: Int -> Parser Height
+unitParser value =
+  let cmParser = do
+        P.string "cm"
+        return (InCms value)
+
+      inParser = do
+        P.string "in"
+        return (InInches value)
+   in P.choice [cmParser, inParser]
+```
+
+The rest of the parsers are basically a step by step translation of the
+requirements in English:
+
+```haskell
+-- hcl (Hair Color) - a '#' followed by six chars 0-9 or a-f.
+hairColorParser :: Parser String
+hairColorParser = do
+  P.string "hcl"
+  P.char ':'
+  P.char '#'
+  v <- P.count 6 (P.oneOf "0123456789abcdef")
+  P.spaces
+  return v
+```
+
+```haskell
+-- pid (Passport ID) - a nine-digit number.
+passportIdParser :: Parser String
+passportIdParser = do
+  P.string "pid"
+  P.char ':'
+  v <- P.count 9 P.digit
+  P.spaces
+  return v
+```
+
+```haskell
+-- cid (Country ID) - ignored, missing or not.
+countryIdParser :: Parser Int
+countryIdParser = do
+  P.string "cid"
+  P.char ':'
+  value <- P.many1 P.digit
+  P.spaces
+  return $ read value
+```
+
+```haskell
+-- ecl (Eye Color) - one of: amb blu brn gry grn hzl oth.
+eyeColorParser :: Parser String
+eyeColorParser = do
+  P.string "ecl"
+  P.char ':'
+  v <-
+    P.choice $
+      map
+        (P.try . P.string)
+        [ "amb",
+          "blu",
+          "brn",
+          "gry",
+          "grn",
+          "hzl",
+          "oth"
+        ]
+  P.spaces
+  return v
+```
+
+You will notice I had to use this mysterious `P.try` function in the last
+snippet. This is because by default `Text.Parsec` parsers do not backtrack,
+so as soon as the parser explores one of the alternatives (for example
+`blu` or `brn`) it will get stuck. `P.try` makes any parser backtrackable,
+even though it can be frowned upon for making our parser less performant :)
+
+## Another problem?!
+
+Remember that the fields can be written in any order? Uh oh.
+
+Since our parser tries to consume input one character at a time, how the
+heck can we write one that has to deal with randomly ordered input?
+
+It is impossible, right?
+
+No, it's **possible**!
+
+The parsec library includes this wonderful `Text.Parsec.Perm` module, which
+allows us to:
+
+> This module implements permutation parsers. A permutation phrase is a
+> sequence of elements (possibly of different types) in which each element
+> occurs exactly once and the order is irrelevant. Some of the permutable
+> elements may be optional.
+
+Let's import the library:
+
+```haskell
+import Text.Parsec.Perm (permute, (<$$>), (<|?>), (<||>))
+```
+
+Woah, lots of operators there mate.
+
+- `permute` is the last call that will wrap everything up and return a
+    parser of something.
+- `<$$>` is used to assign all the fields that we parsed to something. In
+    our case it will be a `Passport`.
+- `<||>` is used to describe a required field
+- `<|?>` is used to describe an optional field
+
+Ready for the big reveal?
+
+```haskell
+passportParser :: Parser Passport
+passportParser =
+  permute $
+    Passport <$$> byrParser
+      <||> iyrParser
+      <||> P.try eyrParser
+      <||> P.try heightParser
+      <||> P.try hairColorParser
+      <||> P.try eyeColorParser
+      <||> passportIdParser
+      <|?> (Nothing, Just <$> countryIdParser)
+```
+
+And in our main function we need to wire it up:
+
+```haskell
+import Data.Either (rights)
+
+main :: IO ()
+main = do
+  contents <- readFile "input.txt"
+  let passports =
+        rights $
+          map
+            (P.parse passportParser "")
+            (S.splitOn "\n\n" contents)
+  print $ length passports
+```
+
+That's all we need! We can get rid of the `PassportField` type, the other
+`PassportField` type and all that validation code. Welcome to the world of
+parsing! Take a look at our final version of the code
+[here](https://gist.github.com/Arkham/f3b76516b8a9c07cf2b0038871c60657).
+
+I hope you enjoyed this deep dive into parsing, thanks for reading!
