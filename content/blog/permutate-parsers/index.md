@@ -1,6 +1,6 @@
 ---
 title: Permutate parsers, don't validate
-date: "2021-01-10T12:00:00.000Z"
+date: "2021-01-13T12:00:00.000Z"
 description: A practical example of “Parse, don't validate” in Haskell.
 ---
 
@@ -57,7 +57,7 @@ of passports composed of these fields:
 All the fields are required except for the `cid` field, which is optional.
 Note that the fields can be written in any order, this will be important
 later. Our batch is composed of multiple passports separated by empty lines
-(our `input.txt`):
+(the `input.txt`):
 
 ```plain
 ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
@@ -104,9 +104,10 @@ parseEntry :: String -> PassportEntry
 parseEntry text = undefined
 ```
 
-Nothing too fancy here, I'm using `Data.List.Split` from the `split`
-package to do the heavy lifting. And I've conveniently stubbed the
-implementation of `parseEntry` so that the code compiles.
+Nothing too fancy here, we're using `Data.List.Split` from the `split`
+package to do the heavy lifting. And the implementation of `parseEntry` has
+been conveniently stubbed so that the code compiles.
+
 Now how should our `PassportEntry` data structure look like? I'd love to
 eventually represent passports as:
 
@@ -123,15 +124,14 @@ data Passport = Passport
   }
 ```
 
-The problem is that the fields are ordered arbitrarily, so we can't really
-know in which order they will come. So we might want to store fields in
-another data structure, then later convert them to our beautiful `Passport`
-representation.
+If we imagine parsing each field sequentially, we can see that we won't be
+able to construct this data structure in a single operation. We'll have to
+accumulate the data up until we're ready to create a proper `Passport`.
 
-One way to store the fields is to insert them into a hash. First of all, I
-want to use a custom data type to represent the keys of the hash. Why is
-that? I really don't want to be making typos later when comparing raw
-strings like `"ecl"` and `"elc"`.  I'll use a `HashMap` from the
+One way to store the fields is to insert them into a hash. First of all,
+we're going to use a custom data type to represent the keys of the hash.
+Why is that? We really don't want to be making typos later when comparing
+raw strings like `"ecl"` and `"elc"`. We'll use a `HashMap` from the
 `Data.HashMap.Strict` module:
 
 ```haskell
@@ -177,7 +177,7 @@ instance Hashable PassportField
 type PassportEntry = HM.HashMap PassportField String
 ```
 
-Don't worry about any of that means. Just take it as a God-given truth. 💖
+Don't worry about what we've added. Just take them as God-given truths. 👼
 
 Okay, now we can implement our `parseEntry` function:
 
@@ -214,7 +214,7 @@ parseTag value =
       Nothing
 ```
 
-We try to parse each field (such as `byr:2002`) into our `PassportField`
+We try to parse each field (such as `byr:2002`) into a `PassportField`
 type, then end up building a hash using `HM.fromList`. We can take this for
 a spin:
 
@@ -399,7 +399,7 @@ isEntryValid entry =
 ```
 
 Running this program on our second data sample yields `1`, and it will be
-good enough to solve the Advent of Code challenge and get you those sweet
+good enough to solve the Advent of Code challenge and get us those sweet
 sweet stars.
 
 🎉 🎉 🎉
@@ -417,10 +417,15 @@ would have told us snarkily:
 
 > das Kind mit dem Bade ausschütten
 
-Yes, we're literally _throwing the baby out with the bathwater_.
+Yes, literally _throwing the baby out with the bathwater_.
 
-We realize this is even more true if we tried to take the data and fill
-that ideal `Passport` representation we were mentioning earlier:
+This would be even more true if we were given a new challenge:
+
+> Now find the unique set of eye colors in all valid passports
+
+With our current code, we know which passport is valid, but we have no way
+of extracting the eye color of a valid passport. This is why earlier we
+were mentioning this sort of `Passport` representation:
 
 ```haskell
 data Passport = Passport
@@ -435,17 +440,26 @@ data Passport = Passport
   }
 ```
 
-We'd like to write a `entryToPassport` function with this shape:
+If we had a function like `parsePassport` that went from `String` to `Maybe
+Passport` we could then write some code like this:
 
 ```haskell
-PassportEntry -> Maybe Passport
+Set.fromList $
+  map eyeColor $
+  mapMaybe parsePassport (S.splitOn "\n\n" contents)
 ```
 
-Oh boy, we're really stuck now. We have a function to validate the fields,
-but that function doesn't give us a nice way to _extract_ that data and use
-it. We really did that work for nothing...
+But let's not get too ahead of ourselves. Let's try to refactor our current
+code to do something similar. First we can try to write a function like
+this one:
 
-One trick we could employ it to write a function like this:
+```haskell
+entryToPassport :: PassportEntry -> Maybe Passport
+```
+
+This function takes the intermediate representation of a collection of
+passport fields and returns a 'validated' passport. We can also reuse our
+`isFieldValid` function by using this trick:
 
 ```haskell
 parseField ::
@@ -457,8 +471,8 @@ parseField tuple =
 ```
 
 We are still reusing the validating logic, but we end up returning
-something useful instead. We are slowly migrating our code from validating
-data to parsing data!
+something useful instead. Remember, we are slowly migrating our code from
+validating data to parsing data.
 
 Using our new helper we can finally implement the `entryToPassport`
 function. We'll do that in two separate steps. First we'll get all the
@@ -500,10 +514,10 @@ entryToPassport entry = do
       Nothing
 ```
 
-This is far from ideal: we end up having to pass `String` values around,
-which need to be parsed again into the exact types that we desire. Also we
-need to pass these values into a list and hope not to mess up the ordering
-of the fields. So it's far from perfect, but we're getting somewhere.
+We end up having to pass `String` values around, which need to be parsed
+again into the exact types that we desire. Also we need to pass these
+values into a list and hope not to mess up the ordering of the fields. So
+it's far from perfect, but we're getting somewhere.
 
 In order to use this function in our main, we replace the last line of the
 main fuction from:
@@ -521,8 +535,30 @@ print $ length $ mapMaybe entryToPassport entries
 Running
 [this](https://gist.github.com/Arkham/22cb983c61f5a6aaf54227c94d0c7a6b) on
 our test batch still returns `1`, which is a good sign we haven't broken
-anything. Still, I'm unhappy we had to parse our data twice, so let's look
-at something new.
+anything.
+
+Still, there is one thing that I'm particularly unhappy about in this code:
+we use an intermediate representation of the passport that has no real
+domain value. Nobody cares about `PassportField` and `PassportEntry`, but
+we need to have these types in order to build our `Passport`.
+
+Not only that, but having these intermediate types means that there are
+bugs waiting to happen when we transform them to our desired data type:
+
+- getting the order of the fields wrong
+- parsing strings in inconsistent ways
+- forgetting to validate the presence of required fields
+
+This is also known as _shotgun parsing_:
+
+> Shotgun parsing is a programming antipattern whereby parsing and input-validating code is mixed with and spread across processing code—throwing a cloud of checks at the input, and hoping, without any systematic justification, that one or another would catch all the “bad” cases.
+
+In "Parse, don't validate", Alexis King goes on to describe how this is
+specifically related to parsing and validating:
+
+> It may not be immediately apparent what shotgun parsing has to do with validation—after all, if you do all your validation up front, you mitigate the risk of shotgun parsing. The problem is that validation-based approaches make it extremely difficult or impossible to determine if everything was actually validated up front or if some of those so-called “impossible” cases might actually happen. The entire program must assume that raising an exception anywhere is not only possible, it’s regularly necessary.
+
+How can we avoid doing this? Let's try something new!
 
 ## A new perspective
 
@@ -737,8 +773,11 @@ eyeColorParser = do
 You will notice I had to use this mysterious `P.try` function in the last
 snippet. This is because by default `Text.Parsec` parsers do not backtrack,
 so as soon as the parser explores one of the alternatives (for example
-`blu` or `brn`) it will get stuck. `P.try` makes any parser backtrackable,
-even though it can be frowned upon for making our parser less performant :)
+`blu/brn` or `gry/grn`) it will get stuck. `P.try` makes any parser backtrackable,
+even though it can be frowned upon for making our parser a tad less performant :)
+
+We have now written parsers for each individual field. So now it's time to
+combine them all together...
 
 ## Another problem?!
 
@@ -751,21 +790,20 @@ It is impossible, right?
 
 No, it's **possible**!
 
-The parsec library includes this wonderful `Text.Parsec.Perm` module, which
-allows us to:
+The `parsec` library includes a wonderful `Text.Parsec.Perm` module:
 
 > This module implements permutation parsers. A permutation phrase is a
 > sequence of elements (possibly of different types) in which each element
 > occurs exactly once and the order is irrelevant. Some of the permutable
 > elements may be optional.
 
-Let's import the library:
+Let's import it:
 
 ```haskell
 import Text.Parsec.Perm (permute, (<$$>), (<|?>), (<||>))
 ```
 
-Woah, lots of operators there mate.
+Woah, calm down, that's lots of operators there mate.
 
 - `permute` is the last call that will wrap everything up and return a
     parser of something.
@@ -774,7 +812,7 @@ Woah, lots of operators there mate.
 - `<||>` is used to describe a required field
 - `<|?>` is used to describe an optional field
 
-Ready for the big reveal?
+Ready for the big reveal? 🥁🥁🥁
 
 ```haskell
 passportParser :: Parser Passport
@@ -790,7 +828,11 @@ passportParser =
       <|?> (Nothing, Just <$> countryIdParser)
 ```
 
-And in our main function we need to wire it up:
+This parser can parse passports which fields are written in any
+random order, as long as each required field is present once. Pretty slick,
+eh?
+
+We just need to wire it up in our main:
 
 ```haskell
 import Data.Either (rights)
@@ -806,9 +848,15 @@ main = do
   print $ length passports
 ```
 
-That's all we need! We can get rid of the `PassportField` type, the other
-`PassportField` type and all that validation code. Welcome to the world of
-parsing! Take a look at our final version of the code
-[here](https://gist.github.com/Arkham/f3b76516b8a9c07cf2b0038871c60657).
+That's all we need! We can now get rid of the intermediate `PassportField`
+and `PassportEntry` types and all that validation code. Welcome to the
+wonderful world of parsing!
+
+If you glance over the [final
+listing](https://gist.github.com/Arkham/f3b76516b8a9c07cf2b0038871c60657)
+you'd be surprised to see how tidy it is. We have a description of the
+input that we'd like to parse and nothing more. No validations, no
+transformations, no other massaging of the types. That's the beauty of
+parsing and expressing real world problems in terms of parsing.
 
 I hope you enjoyed this deep dive into parsing, thanks for reading!
