@@ -770,11 +770,15 @@ eyeColorParser = do
   return v
 ```
 
-You will notice I had to use this mysterious `P.try` function in the last
-snippet. This is because by default `Text.Parsec` parsers do not backtrack,
-so as soon as the parser explores one of the alternatives (for example
-`blu/brn` or `gry/grn`) it will get stuck. `P.try` makes any parser backtrackable,
-even though it can be frowned upon for making our parser a tad less performant :)
+You will notice we had to use this mysterious `P.try` function in the last
+snippet. This is very useful when we need to look ahead in the input
+string. Consider the example of `blu` and `brn`: after consuming an initial
+`b` character we land in the `blu` branch. If at that point we encounter a
+`r` character, we realize we need to go back and choose the `brn` branch
+instead. But by default the parsing would stop because we have already
+consumed the first character. `P.try` will make it so our parser pretends
+it hasn't consumed any input so that we can keep trying other
+alternatives.
 
 We have now written parsers for each individual field. So now it's time to
 combine them all together...
