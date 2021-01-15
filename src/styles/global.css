@@ -2,13 +2,24 @@
   margin-bottom: 1.75rem;
 }
 
-code {
-  font-family: Fira Mono, Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace !important;
+.gatsby-highlight code {
+  font-family: Fira Mono, Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
-code[class*="language-"]::selection,
-code[class*="language-"] span::selection {
+.gatsby-highlight code[class*="language-"]::selection,
+.gatsby-highlight code[class*="language-"] span::selection {
   color: white;
+}
+
+@media only screen and (max-width: 600px) {
+  .gatsby-highlight pre {
+    margin: 0.5em -1.3125rem;
+    padding: 0.5em 1.3125rem;
+  }
+
+  .gatsby-highlight pre code {
+    font-size: 12px;
+  }
 }
 
 p + ul {
