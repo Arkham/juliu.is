@@ -20,7 +20,7 @@ That's pretty much all I knew about it.
 Usually, this is great in software: _"Learn enough to be dangerous"_ they
 say. But invariably I would find myself fighting with `z-index` and
 spending hours trying to understand what is wrong with the world, the
-universe and everything.
+universe, and everything.
 
 I'm pretty sure it's not just me. It's common to bump into CSS like this:
 
@@ -41,9 +41,9 @@ I've created a [little app](https://z-index.juliu.is) to make things easy. It lo
 The boxes on the right are positioned statically. This is the default when
 you don't specify a `position` property, therefore a statically positioned
 box is also known as a **non-positioned** box. I've added some negative
-margins so they overlap with one another. On the left you can type some
-styles which will be applied to the boxes. Notice that you can also share
-the setup by copying the URL. Let's get us started now!
+margins so they overlap with one another. On the left-hand side, you can
+type some styles which will be applied to the boxes. Notice that you can
+also share the setup by copying the URL. Let's get us started now!
 
 ## Ordering matters
 
@@ -93,8 +93,8 @@ It turns out that positioned boxes appear on top of non-positioned boxes.
 If you're inclined, the [spec](https://www.w3.org/TR/CSS2/zindex.html) goes
 into **much** more detail.
 
-But if all the boxes are positioned, we revert back to the ordering in the
-HTML source. Look at
+But if all the boxes are positioned, we revert to following the order in
+the HTML source. Look at
 [this](https://z-index.juliu.is/?css=b%2Bposition%3A%20relative%7Cp%2Bposition%3A%20relative%7Cr%2Bposition%3A%20relative):
 
 ![all positioned](./all-positioned.png)
@@ -114,7 +114,7 @@ example](https://z-index.juliu.is/?css=b%2Bposition%3A%20relative%7Cr%2Bposition
 
 ![mystery](./mystery.png)
 
-Out of the three positioned boxes the yellow one has `z-index: 1`, and
+Out of the three positioned boxes, the yellow one has `z-index: 1`, and
 therefore appears on top. Good, the world is making sense.
 
 But what if we give a `z-index` to  the parent of the yellow box? Our
@@ -131,7 +131,7 @@ Let's take a bit of a detour...
 ## Auto is not zero
 
 If we don't set the `z-index` property of an element, its default value is
-going to be `auto`. Such element will appear in front of elements with
+going to be `auto`. Such elements will appear in front of elements with
 negative `z-index` values and below elements with positive `z-index`
 values.
 [This](https://z-index.juliu.is/?css=b%2Bposition%3A%20relative%7Cp%2Bposition%3A%20relative%3Bz-index%3A%201%7Cr%2Bposition%3A%20relative%3Bz-index%3A%20-1)
@@ -140,13 +140,13 @@ should convince you that I'm not lying:
 ![z-index auto](./z-index-auto.png)
 
 So in a way that element behaves as if we set `z-index: 0`. Indeed, if we
-add that css rule, we see no notable changes in the
+add that CSS rule, we see no notable changes in the
 [output](https://z-index.juliu.is/?css=b%2Bposition%3A%20relative%3Bz-index%3A%200%7Cp%2Bposition%3A%20relative%3Bz-index%3A%201%7Cr%2Bposition%3A%20relative%3Bz-index%3A%20-1):
 
 ![z-index zero](./z-index-zero.png)
 
-But actually things changed a lot! Giving a value to `z-index` to a
-relatively positioned box creates a new **stacking context**.
+But things changed a lot! Giving a value to `z-index` to a relatively
+positioned box creates a new **stacking context**.
 
 A stacking what?
 [MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context) says:
@@ -169,11 +169,11 @@ Setting `z-index: 0` on the blue box changed the meaning of the `z-index`
 declaration on the yellow box. Before, the yellow box was out there playing
 with the big boys. Now, it can only affect stacking within the blue box.
 
-This is a great cause of frustation. No matter how high you set a `z-index`
-property, you will _never_ be able to 'escape' the parent stacking context.
-And every time you are struggling with making `z-index` work you can bet
-that it's because _something_ created a stacking context that you can't
-escape from.
+This is a great cause of frustration. No matter how high you set a
+`z-index` property, you will _never_ be able to 'escape' the parent
+stacking context.  And every time you are struggling with making `z-index`
+work you can bet that it's because _something_ created a stacking context
+that you can't escape from.
 
 With this newfound understanding, spend some time explaining why [this
 example](https://z-index.juliu.is/?css=b%2Bposition%3A%20relative%3Bz-index%3A%201%7Cg%2Bposition%3A%20relative%3Bz-index%3A%2010%7Cp%2Bposition%3A%20relative%3Bz-index%3A%202%7Cr%2Bposition%3A%20relative%7Cy%2Bposition%3A%20relative%3Bz-index%3A%205%3Bheight%3A%20200px) makes perfect sense:
