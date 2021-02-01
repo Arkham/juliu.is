@@ -1,6 +1,6 @@
 ---
 title: "z-index by examples"
-date: "2021-01-20T12:00:00.000Z"
+date: "2021-02-01T12:00:00.000Z"
 description: "Or “z-index: 99999” considered harmful"
 ---
 
@@ -19,8 +19,8 @@ That's pretty much all I knew about it.
 
 Usually, this is great in software: _"Learn enough to be dangerous"_ they
 say. But invariably I would find myself fighting with `z-index` and
-spending hours trying to understand what is wrong with the world, the
-universe, and everything.
+spending hours trying to understand what is wrong with Life, the Universe,
+and Everything.
 
 I'm pretty sure it's not just me. It's common to bump into CSS like this:
 
@@ -41,9 +41,11 @@ I've created a [little app](https://z-index.juliu.is) to make things easy. It lo
 The boxes on the right are positioned statically. This is the default when
 you don't specify a `position` property, therefore a statically positioned
 box is also known as a **non-positioned** box. I've added some negative
-margins so they overlap with one another. On the left-hand side, you can
-type some styles which will be applied to the boxes. Notice that you can
-also share the setup by copying the URL. Let's get us started now!
+margins so they overlap with one another.
+
+On the left-hand side, you can type some styles which will be applied to
+the boxes. Notice that you can also share the setup by copying the URL.
+Let's get started now!
 
 ## Ordering matters
 
@@ -117,14 +119,15 @@ example](https://z-index.juliu.is/?css=b%2Bposition%3A%20relative%7Cr%2Bposition
 Out of the three positioned boxes, the yellow one has `z-index: 1`, and
 therefore appears on top. Good, the world is making sense.
 
-But what if we give a `z-index` to  the parent of the yellow box? Our
+But what if we give a `z-index` to the blue box, the parent of the yellow box? Our
 example would look like
 [this](https://z-index.juliu.is/?css=b%2Bposition%3A%20relative%3Bz-index%3A%200%7Cr%2Bposition%3A%20relative%7Cy%2Bposition%3A%20relative%3Bz-index%3A%201%3Bheight%3A%20200px):
 
 ![mystery part two](./mystery-two.png)
 
 What's happening here? Our yellow box is now rendered below the red one?!
-All this because we added a `z-index: 0`?!? The world makes no sense. 😿
+All this because we added a `z-index: 0` to the blue one?! The world is
+making no sense again. 😿
 
 Let's take a bit of a detour...
 
@@ -151,13 +154,18 @@ positioned box creates a new **stacking context**.
 A stacking what?
 [MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context) says:
 
-> The stacking context is a three-dimensional conceptualization of HTML elements along an imaginary z-axis relative to the user, who is assumed to be facing the viewport or the webpage. HTML elements occupy this space in priority order based on element attributes.
+> The stacking context is a three-dimensional conceptualization of HTML
+> elements along an imaginary z-axis relative to the user, who is assumed
+> to be facing the viewport or the webpage. HTML elements occupy this space
+> in priority order based on element attributes.
 
 I thought this is what we were trying to do all along. Let's keep reading.
 
 The interesting part comes later:
 
-> Within a stacking context, child elements are stacked according to the same rules previously explained. Importantly, the z-index values of its child stacking contexts only have meaning in this parent.
+> Within a stacking context, child elements are stacked according to the
+> same rules previously explained. Importantly, the z-index values of its
+> child stacking contexts only have meaning in this parent.
 
 That's the key point. A stacking context will force the `z-index` of its
 child stacking contexts to only have a local meaning. Let's look at our
@@ -179,6 +187,11 @@ With this newfound understanding, spend some time explaining why [this
 example](https://z-index.juliu.is/?css=b%2Bposition%3A%20relative%3Bz-index%3A%201%7Cg%2Bposition%3A%20relative%3Bz-index%3A%2010%7Cp%2Bposition%3A%20relative%3Bz-index%3A%202%7Cr%2Bposition%3A%20relative%7Cy%2Bposition%3A%20relative%3Bz-index%3A%205%3Bheight%3A%20200px) makes perfect sense:
 
 ![no mystery](./no-mystery.png)
+
+Also remember that before we said that positioned elements appear on top of
+non-positioned elements? Well, now we can generalize by saying that
+elements that form a stacking context appear on top of non-positioned
+elements.
 
 ## The usual suspects
 
@@ -203,7 +216,18 @@ list of usual suspects.
 
 ![grid child](./grid-child.png)
 
-As before, I recommend going through each example, playing around with
-it, and explaining in your head why it makes perfect sense.
+Some of these examples might look surprising. In general, the underlying
+reason why these configurations create a new stacking context is that they
+render to an offscreen context. But in practice, you don't need to remember
+all of them: when you bump into a situation where `z-index` isn't working
+as intended, you can quickly check if there's a runaway stacking context
+that's keeping you locked up.
+
+I recommend going through each one of the examples, playing around with
+them, and explaining in your head why they make perfect sense. It might be
+helpful to install a browser extension to help check your intuition and
+solidify your understanding
+([Chrome](https://chrome.google.com/webstore/detail/z-context/jigamimbjojkdgnlldajknogfgncplbh),
+[Firefox](https://addons.mozilla.org/en-GB/firefox/addon/devtools-z-index/)).
 
 That's all I have for you today. As always, thanks for reading!
