@@ -2,7 +2,7 @@
   margin-bottom: 1.75rem;
 }
 
-.gatsby-highlight code {
+.gatsby-highlight code, code.language-text {
   font-family: Fira Mono, Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
