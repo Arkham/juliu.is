@@ -1,7 +1,7 @@
 ---
 title: "z-index by examples"
 date: "2021-02-01T12:00:00.000Z"
-description: "Or “z-index: 99999” considered harmful"
+description: "Or “z-index: 99999” considered harmful."
 ---
 
 I've been writing software "for a living" for more than ten years. I'm
