@@ -1,23 +1,25 @@
 ---
 title: "Elm at NoRedInk"
-date: "2021-02-15T12:00:00.000Z"
+date: "2021-03-16T12:00:00.000Z"
 description: How to organize 500K lines of Elm.
 ---
 
 At [NoRedInk](https://www.noredink.com) we have one of the largest Elm apps
 in the world. It serves millions of teachers and students every day and our
 frontend is exclusively written in Elm. In this post, we will explore the
-structure of our application and the patterns that we use to stay sane.
+structure of our application and the patterns that we use to stay sane. One
+of the most common questions I get about Elm is:
 
-One of the most common questions I get about Elm is "But does it scale? And
-if so, how". Well, I hope that this post can become a comprehensive answer
-to that question.
+> "Does it scale? And if so, how"
+
+Well, I hope that this post can become a comprehensive answer to that
+question.
 
 ## Some stats first
 
 We have a glorious monorepo which contains all the services that power our
-infrastructure. Our main application (aka the `monolith`) is written in
-Rails and has a `ui` folder with all of our Elm code.
+infrastructure. Our biggest application (aka the `monolith`) is written in
+Rails and has a `ui` folder with all of our Elm frontend code.
 
 ```bash
 $ find monolith/ui/src -name "*.elm" | xargs cat | wc -l
@@ -28,17 +30,15 @@ $ find monolith/ui/tests -name "*.elm" | xargs cat | wc -l
 ```
 
 As you can see, we write loads of tests. As much as the Elm compiler gives
-you that wonderful bliss of refactoring, we still want to make sure that
-the code that we deploy is as correct as it can be.
+you that wonderful confidence while refactoring, we still want to make sure that
+the code that we push is as correct as it can be.
 
-In the somewhat famous article ["What to know before debating type
+In ["What to know before debating type
 systems"](https://cdsmith.wordpress.com/2011/01/09/an-old-article-i-wrote/),
-two approaches are given which can help us writing correct programs:
+two different approaches are given to help us writing correct programs:
 
-- **Testing**: establishes upper bounds on correctness
 - **Proof**: establishes lower bounds on correctness
-
-In our case, static types are _lightweight_ proofs:
+- **Testing**: establishes upper bounds on correctness
 
 > An important point here is that static typing does not preclude proving
 > correctness in the traditional way, nor testing the program. It is a
@@ -49,8 +49,8 @@ In our case, static types are _lightweight_ proofs:
 
 ## Rails conventions
 
-Following the Rails architecture, each resource is managed by their own
-controller. So when the teacher wants to manage their classes:
+Following the Rails architecture, each REST resource is managed by its
+controller. So when a teacher wants to manage their classes:
 
 - they visit the `/teach/classes` URL
 - that route is managed by the `Teach::ClassesController` controller
@@ -62,12 +62,12 @@ That view looks like this:
 - content_for :title, "Manage Classes | NoRedInk"
 
 - content_for(:javascript) do
-  = javascript_include_tag 'webpack/teach/classes'
+  = javascript_include_tag "shake/Page/Teach/Classes/index.js"
 
-= elm_mount(@page_data, 'teach-classes-elm')
+= elm_mount(@elm_flags, 'teach-classes-elm')
 ```
 
-What is that `elm_mount` helper? We defined it to be like this:
+What is that `elm_mount` helper? We define it to be like this:
 
 ```ruby
 def elm_mount(flags, prefix = 'elm')
@@ -78,29 +78,33 @@ def elm_mount(flags, prefix = 'elm')
 end
 ```
 
-In short, we need some conventions for the name of the two divs:
+In short, we need some conventions for the names of two nodes:
 - the one that contains the flags that we pass from Rails to Elm
 - the one that will contain the actual Elm app when it's mounted
 
 The javascript file that we include is the result of the compilation of the
-Elm app. We use Coffeescript for making an entrypoint which looks like
-this:
+Elm app. We use a build system called [Shake](https://shakebuild.com/) to
+generate all our assets. The actual entrypoint looks like this:
 
-```coffeescript
-Elm = require('Page/Teach/Classes/Main.elm').Elm
-NriProgram = require 'Nri/Program.coffee'
+```javascript
+import { Elm } from "./Main.elm";
+import * as NriProgram from "Nri/Program.js";
+import setupReadAloud from "ReadAloud/setup.js";
 
-NriProgram.domready ->
-    {subscribe, send} = NriProgram.mountPorts(
-        Elm.Page.Teach.Classes.Main,
-        "ui/src/Page/Teach/Classes/index.coffee",
-        "teach-classes-elm"
-    )
+NriProgram.domready(function () {
+  const { subscribe, send } = NriProgram.mountPorts(
+    Elm.Page.Teach.Classes.Main,
+    "ui/src/Page/Teach/Classes/index.js",
+    "teach-classes-elm"
+  );
+
+  setupReadAloud({ subscribe, send });
+});
 ```
 
 The `NriProgram` that you see here is a small wrapper around common
 operations that we need to perform, such as:
-- passing an environment to our Elm apps so that we can have different
+- passing an environment object to our Elm apps so that we can have different
   settings in test, development and production
 - setting up some basic analytics and reporting
 - grabbing the flags and the div where the Elm app will be mounted
@@ -159,9 +163,9 @@ different fields in our version.
 
 What are the advantages of using a custom `Nri.Program`?
 
-- reducing boilerplate: for example, we can automatically handle decoding failures so that
+- **reducing boilerplate**: for example, we can automatically handle decoding failures so that
   we don't have to worry about them in each individual page.
-- handling generic behaviours: for example, we can automatically detect the user's
+- **handling generic behaviours**: for example, we can automatically detect the user's
   input method to make our product more accessible.
 
 The differences don't stop there. Let's look at the type of the `view` function:
@@ -173,10 +177,11 @@ view : Env -> Model -> Html Msg
 Here we take an additional `Env` argument. This record contains information
 about the current release, the logged in user and the environment where the
 code is running. For example, if we detect that we are running in test
-mode, there is no need to run fancy UI animations, thus we can disable them.
+mode, there is no need to run fancy UI animations, thus we can disable
+them. This in turn makes our tests faster and less flaky.
 
-If you look at the record we pass to `Nri.Program.program` you will notice
-an additional `perform` function. Let's look at the type signature:
+If you look at the record that we pass to `Nri.Program.program` you will notice
+an additional `perform` field. Let's look at the type signature:
 
 ```elm
 perform : Env -> Effect -> Cmd Msg
@@ -193,46 +198,23 @@ The curious change is that a standard update function in Elm returns a
 that? `Cmd Msg` is an opaque type that is meant to be passed as-is to the
 Elm runtime.  But in order to test that the correct side effect has been
 emitted we need to be able to inspect it: so we define our own type and we
-call it `Effect`.  Then we can use the fantastic `elm-program-test` library
-(you can find it
+call it `Effect`.
+
+Then we can use the fantastic `elm-program-test` library (you can find it
 [here](https://package.elm-lang.org/packages/avh4/elm-program-test/latest))
 to test our Elm programs.  In the meanwhile, in our normal application we
 can use the `perform` function to convert the `Effect` representation of a
 side effect to its `Cmd Msg` counterpart.
 
 Similarly, we have another custom wrapper for single page applications called
-`Nri.Spa.Program` which looks like this:
+`Nri.Spa.Program` which mostly wraps `Browser.application`.
 
-```elm
-main : Nri.Spa.Program Flags.Flags Route Model Msg
-main =
-    Nri.Spa.program config
-        { moduleName = "Page.Teach.Classes.Main"
-        , decoder = Flags.decoder
-        , routing =
-            \flags ->
-                { parser = Routes.route
-                , composer = Routes.toUrl
-                }
-        , perform = perform
-        , init = init
-        , update = init
-        , subscriptions = subscriptions
-        , view = view
-        , notFound =
-            { bare = \flags -> notFoundPage flags
-            , initialized = \flags _ -> notFoundPage flags
-            }
-        , shouldSendViewPageEvent = (/=)
-        }
-```
-
-I think that the general lesson here is that just because Elm provides an
-`update` function with the shape `msg -> model -> (model, Cmd msg)` your
-own implementation doesn't need to. You might need more arguments, or
-different types, or even more return values.  As long as you convert the
-result of your function to match the API of `Browser.element` you can have
-any level of customization.
+The general lesson here is that just because Elm provides an `update`
+function with the shape `msg -> model -> (model, Cmd msg)` your own
+version **doesn't need to**. You might need more arguments, or different
+types, or even more return values.  As long as you convert the result of
+your function to match the API of `Browser.element` you can have any level
+of customization.
 
 ## How to write Elm files
 
@@ -254,10 +236,11 @@ Here is a little snapshot of some large files in our codebase:
 1136 src/Page/Preview/PeerReview/Main.elm
 ```
 
-As Evan explains in [this talk](https://www.youtube.com/watch/XpDsk374LDE),
-larger files in Elm are not a problem. We tend to delineate the different
-sections related to model, update and view with comments. Then we extract
-functions around their data structures, rather than their perceived role.
+As Evan Czaplicki explains in [this
+talk](https://www.youtube.com/watch/XpDsk374LDE), larger files in Elm are
+not a problem. We tend to delineate the different sections related to
+model, update and view with comments. Then we extract functions around
+their data structures, rather than their perceived role.
 
 Another point I want to emphasize is that in Elm you don't have to get
 everything right from the start. Choose the simplest architecture that
@@ -301,7 +284,7 @@ view env model =
 
 This is how we build big apps in Elm. That's the secret sauce. By applying
 this concept repeatedly you can scale your Elm apps as much as you want.
-Here is the `Msg` type of our `Teach.Classes.Main` module:
+Here is the actual `Msg` type of our `Teach.Classes.Main` module:
 
 ```elm
 type Msg
@@ -384,24 +367,37 @@ viewSidebar :
 ```
 
 As mentioned above, choose the simplest solution that works. Later you can
-refactor and make it feel good.
+refactor and make it feel good. You can watch [this
+talk](https://www.youtube.com/watch?v=DoA4Txr4GUs) by Richard Feldman if you want
+to learn more.
+
+A good point to reiterate is that, when writing Elm, you don't have to get
+everything right from the start. The compiler gives you an unprecedented
+level of confidence when refactoring code. So go out there and make
+mistakes, then fix them, then keep going.
 
 ## Interacting with JavaScript
 
 We mainly use [ports](https://guide.elm-lang.org/interop/ports.html) to
-interact with JavaScript components. We have two simple rules for ports:
-- All ports return values as `Json.Value`. This is one of the simplest ways
-  to introduce runtime errors in your application. By treating all values
-  as JSON blobs, we must decode them and deal with the eventual decoding
-  failure.
-- All port functions must be documented in the Elm module. We don't want to
+interact with JavaScript code. We have two simple rules for ports:
+- All ports **must** return values as `Json.Value`. If a `Int -> Cmd msg`
+  port receives a float instead, it will crash. This is one of the simplest
+  ways to introduce runtime errors in your application. By treating all
+  values as JSON blobs, we must decode them and deal with the eventual
+  decoding failure.
+- All port functions **must** be documented in the Elm module. We don't want to
   go hunting in JavaScriptLand how a port is being used. A couple of
   lines explaining what the port triggers can go a long way.
 
 In cases where ports are not enough, we use [custom
-elements](https://guide.elm-lang.org/interop/custom_elements.html). For
-example, we have integrated rich text editing on our product using a custom
-element that wraps [quilljs](https://quilljs.com/).
+elements](https://guide.elm-lang.org/interop/custom_elements.html). You
+might want to do this for many reasons, such as reusing [existing React
+components](https://github.com/cultureamp/react-elm-components) inside your
+Elm application. In our case, we have integrated rich text editing on our
+product using a custom element that wraps [quilljs](https://quilljs.com/).
+If you're interested in learning more about integrating custom elements in
+Elm, I recommend watching [this
+talk](https://www.youtube.com/watch?v=tyFe9Pw6TVE) by Luke Westby.
 
 ## Testing
 
@@ -442,4 +438,5 @@ Here's a selection of tools that we use:
 
 ## Fin
 
-That's all for today, thanks for reading 👋
+That's all for today, and if this sort of work interests you do check out [this
+page](https://www.noredink.com/jobs). Thanks for reading 👋
