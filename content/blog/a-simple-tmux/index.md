@@ -28,7 +28,7 @@ $ brew install tmux reattach-to-user-namespace
 
 ## tat
 
-First of all I want you to add this function to your `.bashrc` or `.zshrc`
+First of all I want you to add this function to your `~/.bashrc` or `~/.zshrc`
 or whichever shell you're using:
 
 ```bash
@@ -61,6 +61,8 @@ open the terminal, `cd` into the folder, then `tat`.
 Now let's take a look at the tmux configuration.
 
 ## General configuration
+
+Your config should live in `~/.tmux.conf`.
 
 ### Mac OS integration
 
