@@ -1,10 +1,10 @@
 ---
 title: A simple tmux config
-date: "2021-03-28T12:00:00.000Z"
+date: "2021-03-22T12:00:00.000Z"
 description: Supercharge your terminal experience with tmux.
 ---
 
-I friggin' **love** [tmux](https://github.com/tmux/tmux). It makes my
+I friggin' love [tmux](https://github.com/tmux/tmux). It makes my
 day-to-day terminal experience **so**. **much**. **better**. Being
 efficient in tmux means you don't need tabs any longer. It means you can
 update your terminal emulator while keeping your work intact. It means you
@@ -12,9 +12,9 @@ can sling panes and windows across your terminal as if you were the Last
 Airbender. It's that good.
 
 I thought I'd share a couple of tricks I've picked up over the years. I'd
-heartily recommend reading and understanding each line of your
-configuration: in this way, when things go wrong (and they will), you're
-going to have a faint idea of what caused the problem.
+heartily recommend reading and understanding each line of your configuration:
+in this way, when things go wrong (and they will), you'll be more likely to
+have a hunch of the cause of the problem.
 
 Here's a short demo:
 
@@ -71,7 +71,7 @@ set -g default-shell $SHELL
 set -g default-command "reattach-to-user-namespace -l ${SHELL}"
 ```
 
-This makes sure that tmux plays ball with Mac OS. For example this fixes
+This makes sure that tmux plays ball with Mac OS. For example, this fixes
 the integration of `pbcopy` and `pbpaste`, so that you can seamlessly copy
 in your browser and paste in tmux and vice-versa.
 
@@ -99,8 +99,8 @@ set -g base-index 1
 setw -g pane-base-index 1
 ```
 
-By default, tmux will number panes and windows starting from 0. I find
-indexing things from 1 to be more ergonomic, especially when you want to
+By default, tmux will number panes and windows starting from `0`. I find
+indexing things from `1` to be more ergonomic, especially when you want to
 quickly switch between windows.
 
 ```bash
@@ -113,18 +113,18 @@ index of the other windows. Why? I dunno, but this gets rid of it.
 ### Keys modes
 
 ```bash
-# Use emacs keybinding in status line
+# Use emacs keybindings in the status line
 set-option -g status-keys emacs
 
 # Use vim keybindings in copy mode
 setw -g mode-keys vi
 
-# ESC in vim is delayed
+# Fix ESC delay in vim
 set -g escape-time 10
 ```
 
-Even if you're a hardcore vim user, you want to use emacs keybinding in the
-status line. Trust me.
+Even if you're a hardcore vim user, you'll want to use emacs keybinding in
+the status line.
 
 ## Key Bindings
 
@@ -136,15 +136,15 @@ set -g prefix C-a
 ```
 
 The prefix is the entry point to each command you're going to use. I chose
-`Ctrl-a` because it's easier to press with a single hand.
+`Ctrl-a` because it's easier to press with my left hand.
 
 ```bash
 bind C-a send-prefix
 ```
 
 Since we set `Ctrl-a` to be our prefix, it will be intercepted by tmux and
-won't be forwarded to the programs we use. With this setting, we can press
-it twice to send it anyways.
+won't be forwarded to any program. With this setting, we can press it twice
+to send it through anyways.
 
 ### Copy mode
 
@@ -207,11 +207,15 @@ bind b break-pane -d
 
 Press `Ctrl-a b` to break the current pane into a new window.
 
+Another shortcut I use all the time is `Ctrl-a z` to expand the current
+pane full-screen. Press it again to return to your previous pane
+configuration.
+
 ### Vim integration
 
 First of all, install
 [vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) and
-add these remaps to your `.vimrc`:
+add these lines to your `~/.vimrc`:
 
 ```vim
 nnoremap <C-J> <C-W>j
@@ -222,7 +226,7 @@ nnoremap <C-L> <C-W>l
 
 These will allow us to switch between Vim splits by just pressing
 `Ctrl-j` instead of `Ctrl-w j`. Then add this to your
-`.tmux.conf`:
+`~/.tmux.conf`:
 
 ```plain
 is_vim="ps -o state= -o comm= -t '#{pane_tty}' \
@@ -245,7 +249,8 @@ bind-key -T copy-mode-vi 'C-\' select-pane -l
 ```
 
 Now you will be able to seamlessly navigate between Vim splits and tmux
-panes using `Ctrl-h`, `Ctrl-j`, `Ctrl-k`, and `Ctrl-l`.
+panes using `Ctrl-h`, `Ctrl-j`, `Ctrl-k`, and `Ctrl-l`. You can switch
+between the last two panes by repeatedly pressing `Ctrl-\`.
 
 ## Cool status bar
 
@@ -269,4 +274,6 @@ Here's a preview:
 
 ## Fin
 
-If you'd like, you can get a copy of the whole config [here](https://github.com/Arkham/dotfiles.nix/blob/master/tmux.conf). Feel free to reach out on Twitter if you have questions. That's all, thanks for reading! 🌊
+If you'd like, you can get a copy of the whole config [here](https://github.com/Arkham/dotfiles.nix/blob/master/tmux.conf). If you don't feel like maintaining this configuration yourself you can try out [tmux-sensible](https://github.com/tmux-plugins/tmux-sensible).
+
+Feel free to reach out on Twitter for help. That's all, thanks for reading! 🌊
