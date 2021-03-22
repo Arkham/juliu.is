@@ -23,7 +23,7 @@ Here's a short demo:
 ## Mac OS install
 
 ```bash
-$ brew install tmux reattach-to-user-namespace
+$ brew install tmux
 ```
 
 ## tat
@@ -63,18 +63,6 @@ Now let's take a look at the tmux configuration.
 ## General configuration
 
 Your config should live in `~/.tmux.conf`.
-
-### Mac OS integration
-
-```bash
-set -g default-shell $SHELL
-set -g default-command "reattach-to-user-namespace -l ${SHELL}"
-```
-
-This makes sure that tmux plays ball with Mac OS. For example, this fixes
-the integration of `pbcopy` and `pbpaste`, so that you can seamlessly copy
-in your browser and paste in tmux and vice-versa.
-
 
 ### Mouse
 
