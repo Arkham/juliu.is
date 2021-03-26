@@ -138,9 +138,9 @@ view model =
         ]
 ```
 
-As you can see, no matter how you change the view, the value won't be
-updated. This happens because we haven't defined a `onInput` event on the
-select :(
+As you [can see](https://ellie-app.com/cK5MMdrG8LYa1), no matter how you
+change the view, the value won't be updated. This happens because we
+haven't defined a `onInput` event on the select :(
 
 ```elm
 import Html.Events as Events
