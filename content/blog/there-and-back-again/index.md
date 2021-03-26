@@ -1,6 +1,6 @@
 ---
 title: There and back again
-date: "2021-03-20T12:00:00.000Z"
+date: "2021-03-26T12:00:00.000Z"
 description: A tale of converting and converting back
 ---
 
@@ -436,7 +436,7 @@ Is there a way to achieve something similar in Elm?
 
 Yes, there is! 🍨
 
-Truth to be told, we can't do _exactly_ what Haskell does, but we can _emulate_ Haskell's behaviour by using a wonderful library called [elm-review](https://package.elm-lang.org/packages/jfmengels/elm-review/latest/).
+Truth be told, we can't do _exactly_ what Haskell does, but we can _emulate_ Haskell's behaviour by using a wonderful library called [elm-review](https://package.elm-lang.org/packages/jfmengels/elm-review/latest/).
 
 `elm-review` analyzes your Elm code and reports patterns that violate
 certain rules. We can use it to enforce additional guarantees on our
