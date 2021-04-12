@@ -174,13 +174,13 @@ A blessing when you're testing out changes in your config.
 
 ### More windows management
 
-```plain
+```none
 bind c new-window -c '#{pane_current_path}'
 ```
 
 Press `Ctrl-a c` to open a new window with the same path.
 
-```plain
+```none
 bind '\' split-window -h -c '#{pane_current_path}'
 bind - split-window -v -c '#{pane_current_path}'
 ```
@@ -216,7 +216,7 @@ These will allow us to switch between Vim splits by just pressing
 `Ctrl-j` instead of `Ctrl-w j`. Then add this to your
 `~/.tmux.conf`:
 
-```plain
+```none
 is_vim="ps -o state= -o comm= -t '#{pane_tty}' \
     | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|n?vim?x?)(diff)?$'"
 bind-key -n 'C-h' if-shell "$is_vim" 'send-keys C-h'  'select-pane -L'
@@ -242,7 +242,7 @@ between the last two panes by repeatedly pressing `Ctrl-\`.
 
 ## Cool status bar
 
-```
+```none
 set-option -g status-justify left
 set-option -g status-left '#[bg=colour72] #[bg=colour237] #[bg=colour236] #[bg=colour235]#[fg=colour185] #S #[bg=colour236] '
 set-option -g status-left-length 16

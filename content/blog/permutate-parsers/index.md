@@ -43,7 +43,7 @@ power of bringing this concept to its limits. Which brings us to...
 We [are tasked](https://adventofcode.com/2020/day/4) with parsing a batch
 of passports composed of these fields:
 
-```plain
+```none
 - byr (Birth Year)
 - iyr (Issue Year)
 - eyr (Expiration Year)
@@ -59,7 +59,7 @@ Note that the fields can be written in any order, this will be important
 later. Our batch is composed of multiple passports separated by empty lines
 (the `input.txt`):
 
-```plain
+```none
 ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
 byr:1937 iyr:2017 cid:147 hgt:183cm
 
@@ -306,7 +306,7 @@ refresher.
 
 In the second part of the challenge, these new rules are added:
 
-```plain
+```none
 - byr (Birth Year) - four digits; between 1920 and 2002.
 - iyr (Issue Year) - four digits; between 2010 and 2020.
 - eyr (Expiration Year) - four digits; between 2020 and 2030.
@@ -321,7 +321,7 @@ In the second part of the challenge, these new rules are added:
 
 Here is a new batch for us to peruse:
 
-```plain
+```none
 pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980
 hcl:#623a2f
 

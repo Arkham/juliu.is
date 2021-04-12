@@ -105,7 +105,7 @@ The great thing about zero is that it helps us to define a relationship
 between numbers. The number `3` has now this beautiful property with
 itself:
 
-```
+```none
 3 - 3 = 0
 ```
 
@@ -158,14 +158,14 @@ and then back to `Mood` without losing information.
 Two types `A` and `B` are isomorphic if two conversion functions exist such
 that:
 
-```
+```haskell
 f :: A -> B
 g :: B -> A
 ```
 
 And these two properties are valid:
 
-```
+```haskell
 f . g = id
 g . f = id
 ```
@@ -253,7 +253,7 @@ Prelude> curry (uncurry (+)) 1 2
 After looking at the type signatures again we can say that these following
 functions are isomorphic:
 
-```
+```haskell
 ((a, b) -> c) -> a -> b -> c
 (a -> b -> c) -> (a, b) -> c
 ```
@@ -264,14 +264,14 @@ Pretty neat!
 
 In Haskell you would sometimes see this type:
 
-```
+```haskell
 foo :: ()
 ```
 
 It's an empty tuple, which is referred to as the _unit_. It can contain a
 single value, which can only be:
 
-```
+```haskell
 ()
 ```
 
