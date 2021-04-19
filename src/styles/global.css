@@ -29,3 +29,7 @@ p + ul {
 ul li {
   margin-bottom: calc(1.75rem / 3);
 }
+
+.anchor {
+  color: transparent;
+}
