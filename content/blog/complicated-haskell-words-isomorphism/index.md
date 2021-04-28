@@ -1,7 +1,7 @@
 ---
 title: Complicated Haskell Words - Isomorphism
 date: "2020-11-29T12:00:00.000Z"
-description: isos "equal", morphe "shape"
+description: isos "equal", morphe "shape".
 ---
 
 As someone who has been learning Haskell on and off for the last year, I
