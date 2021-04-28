@@ -1,19 +1,21 @@
 ---
 title: "Elm at NoRedInk"
-date: "2021-04-27T12:00:00.000Z"
+date: "2021-04-28T12:00:00.000Z"
 description: How to organize 500K lines of Elm.
 ---
 
 At [NoRedInk](https://www.noredink.com) we have one of the largest Elm apps
-in the world. It serves millions of teachers and students every day and our
-frontend code is almost exclusively written in Elm. In this post, we will
-explore the structure of our codebase and the patterns that we use to
-stay sane. One of the most common questions I get about Elm is:
+in the world. It serves millions of teachers and students, and our frontend
+code is almost exclusively written in Elm. In this post, we will explore
+the structure of our codebase and the patterns that we use to stay sane.
+One of the most common questions I get about Elm is:
 
-> "Does it scale? And if so, how"
+> "Does it scale? And if so, how?"
 
-I hope that this post can become a comprehensive answer to that
-question.
+I don't think that there can ever be a comprehensive answer to that
+question, but I hope this post can be a useful reference to resources and
+techniques we've used to solve real-world problems, so you can dig deeper
+at your own leisure.
 
 ## Table of contents
 
@@ -61,10 +63,10 @@ Elm           129     2428       1728     26399
 -----------------------------------------------
 ```
 
-As you can see, we end up auto-generating a lot of elm code. We do this for
-multiple purposes, such as automatically generating types from graphql, or
-ensuring that JSON payloads sent from Rails controllers match the
-definitions inside our Elm decoders.
+We end up auto-generating a lot of Elm code: we do this for multiple
+purposes, such as automatically generating types from graphql, or ensuring
+that JSON payloads sent from Rails controllers match the definitions inside
+our Elm decoders.
 
 ```bash
 $ cloc --include-ext=elm content-creation
@@ -77,8 +79,8 @@ Elm            80     3245       1182     13941
 
 At last, here's a snapshot of Elm code in one of our Haskell services. I
 won't spend much time describing how that works in this post, let me know
-if you are interested and I'll write a follow-up. Let's take a deeper look
-at how we integrate with Rails.
+if you are interested and I'll write a follow-up. For now, let's take a
+deeper look at how we integrate with Rails.
 
 ## Rails conventions
 
@@ -114,7 +116,8 @@ end
 
 In short, we need some conventions for the names of two DOM nodes:
 
-- one that contains the flags that we pass from Rails to Elm
+- one that contains the flags that we pass from Rails to Elm: we use this
+  to pass data to the Elm application that needs to be available on boot
 - one that will contain the actual Elm app when it's mounted
 
 The javascript file that we include is the result of the compilation of the
@@ -159,7 +162,7 @@ examples:
 
 In total, we have over a hundred Elm apps that serve different Rails
 controllers. They consist of a mixture of normal Elm applications and
-single-page applications. By adapting the Rails motto of "convention over
+single-page apps. By adapting the Rails motto of "convention over
 configuration" we're pretty confident we can scale this approach indefinitely.
 
 ## Our Elm programs
@@ -284,6 +287,10 @@ everything right from the start. Choose the simplest architecture that
 works. If you need to change it later, the compiler will assist you every
 step of the way. Specifically for this sort of mechanical changes, the
 chance of introducing bugs is very close to zero. If it compiles, it works.
+
+We regularly merge refactors in the thousands of lines that don't introduce
+a single regression to the product. There is really nothing to be afraid
+of! 🍧
 
 ## Nesting the Elm Architecture
 
@@ -462,11 +469,16 @@ We write tests for our Elm code at four different layers:
   of data, run a function on it and assert some results.
 - **View tests**: here we construct a model, pass it to the view
   function and write assertions against the result using `elm-explorations/test`.
-- **Integration tests**: here we load up a generated JSON file, pass it to
-  a `elm-program-test` Program, interact with the elements on the page,
+- **Integration tests**: here we load up an auto-generated JSON file
+    (using `rails_edge_test`, find it [here](https://github.com/NoRedInk/rails_edge_test)), pass it to
+  the `elm-program-test` program, interact with the elements on the page,
   and assert side effects.
-- **Acceptance tests**: we write these in Capybara as golden-path tests.
+- **Acceptance tests**: we write these in Capybara as happy-path tests.
   They are extremely useful to test JavaScript interop.
+
+I can recommend [this excellent
+talk](https://www.youtube.com/watch?v=rIxCwPPA-D8) by Tessa Kelly if you
+want to learn how to write testable Elm.
 
 ## Tooling
 
@@ -493,3 +505,8 @@ Here's a selection of tools that we use:
 
 That's all for today, and if this sort of work interests you do check out [this
 page](https://www.noredink.com/jobs). Thanks for reading 👋
+
+_My eternal gratitude to the wonderful folks that have read through the drafts of
+this post: [@juanedi](https://twitter.com/juanedi), [@brianhicks](https://twitter.com/brianhicks),
+[@rtfeldman](https://twitter.com/rtfeldman), and
+[@michaelglass](https://twitter.com/michaelglass)._
