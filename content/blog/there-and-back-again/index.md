@@ -1,7 +1,7 @@
 ---
 title: There and back again
 date: "2021-03-26T12:00:00.000Z"
-description: A tale of converting and converting back
+description: A tale of converting and converting back.
 ---
 
 When writing Elm, it's very common to use [custom
