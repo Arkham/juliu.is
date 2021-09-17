@@ -79,10 +79,10 @@ $ hello
 
 As you can see, no `hello` command is available yet.
 
-Great, what I haven't told you is that Nix is also a pure, lazy, functional
-[programming language](https://nixos.wiki/wiki/Nix_Expression_Language). Exciting!
-
-We can create a `default.nix` like this one:
+We can write our first configuration in a file called `default.nix`. We'll
+be using the [Nix Expression
+Language](https://nixos.wiki/wiki/Nix_Expression_Language), a pure, lazy,
+functional programming language. Exciting times!
 
 ```nix
 let
@@ -226,12 +226,13 @@ We can then grab the commit part (the third segment) and view it on
 If only we were pointing to the same commit, then we would have exactly the
 same dependencies. But it would be foolish to require every project to
 depend on the same version of nixpkgs. We need a way to specify this on a
-per-project basis, right?
+per-project basis, right? We can use a tool called `niv` to do exactly
+that.
 
 ## niv
 
-In order to pin our configuration to a specific version, we can use
-[niv](https://github.com/nmattia/niv).
+[niv](https://github.com/nmattia/niv) lets us pin our dependencies to a
+specific version, thus ensuring a full reproducibility of our setup.
 
 Let's install it:
 
