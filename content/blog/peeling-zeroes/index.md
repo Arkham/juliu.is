@@ -1,6 +1,6 @@
 ---
 title: Peeling zeroes in Idris
-date: "2021-10-10T12:00:00.000Z"
+date: "2021-10-28T12:00:00.000Z"
 description: An adventure with dependent types in Idris.
 ---
 
@@ -30,8 +30,8 @@ Just "John"
 Nothing
 ```
 
-The reason this function returns a `Maybe` is because we could pass _any_
-number to it. It seems thus unescapable that we need to handle the case
+The reason this function returns a `Maybe` is that we could pass _any_
+number to it. It seems thus inescapable that we need to handle the case
 when the given number is "out of bounds". It seems impossible to conjure a
 function which at the same time is safe and behaves like this:
 
@@ -39,12 +39,12 @@ function which at the same time is safe and behaves like this:
 index : Int -> List a -> a
 ```
 
-This seems peculiar, because unless something quite monstrous happens we
+This seems peculiar because unless something quite monstrous happens we
 know that there will be no further changes to the Beatles lineup. So the
 problem is that **we** know this but the type system doesn't, and it has
 to treat that list as it would treat any other list.
 
-Is there really no way out?
+Is there no way out?
 
 ## Enter Idris
 
@@ -57,9 +57,15 @@ theBeatles = ["John", "Paul", "George", "Ringo"]
 
 What's going on here?
 
-The type also contains information about the length of the list. If we made
-a mistake and forgot one of the Fab Four, the compiler would let us know
-promptly.
+The type also contains information about the length of the list. Let's see
+what happens if we forget one of the Fab Four:
+
+```elm
+theBeatles : Vect 4 String
+theBeatles = ["John", "Paul", "George"]
+```
+
+Idris complains:
 
 ```elm
 When unifying Vect 0 String and Vect 1 String.
@@ -67,17 +73,21 @@ Mismatch between: 0 and 1.
 
 Test:6:39--6:40
  2 |
- 3 | import Data.Vect
+ 3 | import Data.Vect as Vect
  4 |
  5 | theBeatles : Vect 4 String
  6 | theBeatles = ["John", "Paul", "George"]
                                            ^
 ```
 
-This data structure allows us to write something this:
+Don't worry too much about the specifics of the error message, just look at
+that little caret that Idris puts at the end. It's almost as the compiler
+is telling us "Hey, something's missing there".
+
+With this data structure we can write something like this:
 
 ```elm
-> index 0 theBeatles
+> Vect.index 0 theBeatles
 "John"
 ```
 
@@ -85,20 +95,20 @@ Note that we get the raw value, no `Maybe` nonsense here. What about when
 we pass a number that's out of bounds?
 
 ```idris
-> index 6 theBeatles
+> Vect.index 6 theBeatles
 Error: Can't find an implementation for
        IsJust (integerToFin 6 4).
 
 (Interactive):1:12--1:14
- 1 | index 6 theBeatles
+ 1 | Vect.index 6 theBeatles
 ```
 
-Woah, now the compiler now understands. _Cool_. But what's the type
+Woah, now the compiler understands. _Cool_. But what's the type
 signature of this `index` function?
 
 ```elm
-> :t index
-index : Fin len -> Vect len elem -> elem
+> :t Vect.index
+Vect.index : Fin len -> Vect len elem -> elem
 ```
 
 Uh, what that's `Fin` type? It describes a natural number strictly less
@@ -175,28 +185,29 @@ data Fin : Nat -> Type where
 ```
 
 This looks a tad different from the previous `data Nat = Z | S Nat`
-definition, but it's actually quite close:
+definition, but it's quite close:
 - We are defining a function called `Fin` that takes a natural number and returns a type.
 - One possible constructor is `FZ`, which stands for "finite zero".
 - The other constructor is `FS`, which takes an existing `Fin` and returns its successor.
 
 From this explanation it's not clear _how_ we are restricting these natural numbers,
 so let's play around with some finite numbers. Since a literal `0` can
-represent many different numbers we can use the `the` function to tell
-Idris that we want a specific type:
+be an `Int`, a `Nat`, and many other things, we have to use the special
+`the` function to tell Idris which specific type we want:
 
 ```elm
 > the (Fin 1) 0
 FZ
 ```
 
-All good here, nothing to see. How about this?
+So everything is good when we ask for a `0` in `Fin 1`, the set of natural
+numbers strictly less than `1`. How about this?
 
 ```elm
 > the (Fin 0) 0
 ```
 
-This blows up..
+It blows up!
 
 ```
 Error: Can't find an implementation
@@ -206,10 +217,10 @@ for IsJust (integerToFin 0 0).
  1 | the (Fin 0) 0
 ```
 
-By definition the minimum value we can create is `FZ`. The type of this
-value is `Fin (S k)`, and by definition `S k` must be greater than zero. So
-this means that the smallest set we can create is `Fin 1`, which the set
-that only contains zero.
+Why is this happening? By definition the minimum value we can create is
+`FZ`. The type of this value is `Fin (S k)`, and by definition `S k` must
+be greater than zero. So this means that the smallest set we can create is
+`Fin 1`, which is the set that only contains zero.
 
 Let's look at `Fin 2`, the set that contains `0` and `1`.
 
@@ -261,14 +272,14 @@ FS : Fin 1 -> Fin 2
 - we apply `FS`
 - we get a `1` of type `Fin 2`
 
-How would we get a `2` of type `Fin 2`? We would need to apply the function
-twice, going from `Fin 0` to `Fin 1` to `Fin 2`, right?
+How would we get a `2` of type `Fin 2`? We would need to apply the `FS`
+function twice, going from `Fin 0` to `Fin 1` to `Fin 2`, right?
 
-The problem is, such value simply cannot be created.
+The problem is, we simply cannot do that.
 
 The smallest valid finite set is `Fin 1`, which means we just _cannot_
 apply that function twice to create that value. You can only apply it once,
-giving us `1`.
+giving us `1`, which is the largest element in `Fin 2`.
 
 If we look at `Fin 3`, things start making more sense:
 
@@ -295,6 +306,88 @@ to be able to create the next number. Then we keep peeling and peeling, up
 until we just can't peel anything anymore. `Fin 1` is the end of all hopes,
 the last laugh, the final curtain.
 
-I hope you enjoyed this adventure in the land of zeroes and dependent types.
+## And Now for Something Completely Different
+
+If you've followed so far, you're in for a treat 🍭
+
+We've talked a lot about `Vect` and `Fin`, but you don't need any of that
+to reap the benefits we've talked about! Let's go back to lists:
+
+```elm
+theBeatles : List String
+theBeatles = ["John", "Paul", "George", "Ringo"]
+```
+
+Look at this:
+
+```elm
+> List.index 1 theBeatles
+"Paul"
+```
+
+What??? How is it possible it just returns a value, no `Maybe` in sight?
+
+```elm
+> List.index 5 theBeatles
+Error: Can't find an implementation for InBounds 5
+  ["John", "Paul", "George", "Ringo"].
+
+(Interactive):1:1--1:24
+ 1 | List.index 5 theBeatles
+     ^^^^^^^^^^^^^^^^^^^^^^^
+```
+
+Just _how_. Let's dig in:
+
+```elm
+> :t List.index
+List.index :
+  (n : Nat) ->
+  (xs : List a) ->
+  {auto 0 _ : InBounds n xs} ->
+  a
+```
+
+If we look at the third argument we notice some curly braces around it. I
+won't go too much in detail, but that's an [implicit
+argument](https://docs.idris-lang.org/en/latest/tutorial/miscellany.html#implicit-arguments)
+that doesn't need to be passed in when calling the function.
+
+The interesting bit for us is that `InBounds` type:
+
+```elm
+data InBounds : Nat -> List a -> Type where
+  InFirst : InBounds 0 (x :: xs)
+  InLater : InBounds k xs -> InBounds (S k) (x :: xs)
+```
+
+That looks complicated. But how about we compare it to this?
+
+```elm
+data Fin : Nat -> Type where
+  FZ : Fin (S k)
+  FS : Fin k -> Fin (S k)
+```
+
+- There is a base case. We use `x :: xs` to signal that the list must not be empty, so that we can never get an `InFirst` value of type `InBounds 0 []`.
+- There is a function that we can call recursively to peel a layer. In this case, not only do we go from `k` to `S k`, but we also specify that the list gets an extra element in front.
+
+If you squint a bit, you'll see it's the exact type trick we've seen
+before. If we tried to call `List.index 1 ["John"]` we'd have to find a way
+to call the `InLater` function to peel off a layer. Or more concretely:
+
+```elm
+InLater : InBounds k xs -> InBounds (S k) (x :: xs)
+-- becomes
+InLater : InBounds 0 [] -> InBounds 1 ["John"]
+```
+
+The problem is constructing that `InBounds 0 []`. By definition `InFirst`
+has to be `InBounds 0 (x :: xs)`, so we simply cannot create such value.
+Thus the type system cannot find a valid implementation of `InBounds 1 ["John"]`,
+which is exactly the error message Idris prints out. _QED_
+
+I hope you enjoyed this adventure in the land of zeroes and dependent
+types.
 
 Fin 1.
