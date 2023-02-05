@@ -68,7 +68,9 @@ function SEO({ description, lang, meta, title }) {
           content: metaDescription,
         },
       ].concat(meta)}
-    />
+    >
+      <link rel="me" href="https://hachyderm.io/@arkham" />
+    </Helmet>
   )
 }
 
