@@ -49,7 +49,7 @@ function Bio() {
                 }}
               >
                 Personal blog by{" "}
-                <a href={`https://twitter.com/${social.twitter}`}>Ju Liu</a>.
+                <a href={`https://hachyderm.io/@arkham`}>Ju Liu</a>.
               </p>
               <p
                 style={{
