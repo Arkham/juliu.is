@@ -62,7 +62,7 @@ Before we can start on our first project we will need to install
 [direnv](https://direnv.net/), a tool which will let us build
 a custom environment in a specific folder. You'll need to:
 
-- `nix-env -iA direnv`
+- `nix-env -iA nixpkgs.direnv`
 - [hook direnv into your shell](https://direnv.net/docs/hook.html)
 - restart your shell
 
