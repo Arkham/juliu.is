@@ -69,7 +69,7 @@ module.exports = {
         short_name: `juliu.is`,
         start_url: `/`,
         background_color: `#ffffff`,
-        theme_color: `#663399`,
+        theme_color: `#007acc`,
         display: `minimal-ui`,
         icon: `content/assets/icon.png`,
         cache_busting_mode: 'none'
