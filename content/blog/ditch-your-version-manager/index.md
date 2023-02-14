@@ -50,7 +50,7 @@ Let me introduce you to [Nix](https://nixos.org/).
 Let's try it out.
 
 ```bash
-$ sh <(curl -L https://nixos.org/nix/install) --daemon
+$ sh <(curl -L https://nixos.org/nix/install)
 ```
 
 ```bash

@@ -1,75 +1,87 @@
-import React from "react"
+import * as React from "react"
 import { Link, graphql } from "gatsby"
 
 import Bio from "../components/bio"
 import Layout from "../components/layout"
-import SEO from "../components/seo"
-import { rhythm } from "../utils/typography"
+import Seo from "../components/seo"
 
-class BlogIndex extends React.Component {
-  render() {
-    const { data } = this.props
-    const siteTitle = data.site.siteMetadata.title
-    const posts = data.allMarkdownRemark.edges
+const BlogIndex = ({ data, location }) => {
+  const siteTitle = data.site.siteMetadata?.title || `Title`
+  const posts = data.allMarkdownRemark.nodes
 
-    return (
-      <Layout location={this.props.location} title={siteTitle}>
-        <SEO title="All posts" />
-        <Bio />
-        {posts.map(({ node }) => {
-          const title = node.frontmatter.title || node.fields.slug
+  return (
+    <Layout location={location} title={siteTitle}>
+      <Bio />
+      <ol style={{ listStyle: `none` }}>
+        {posts.map(post => {
+          const title = post.frontmatter.title || post.fields.slug
+
           return (
-            <div key={node.fields.slug}>
-              <h2
-                style={{
-                  marginBottom: rhythm(1 / 4),
-                }}
+            <li key={post.fields.slug}>
+              <article
+                className="post-list-item"
+                itemScope
+                itemType="http://schema.org/Article"
               >
-                <Link style={{ boxShadow: `none` }} to={node.fields.slug}>
-                  {title}
-                </Link>
-              </h2>
-              <small>
-                {node.frontmatter.date}
-                {` • `}
-                {node.fields.readingTime.text}
-              </small>
-              <p
-                dangerouslySetInnerHTML={{
-                  __html: node.frontmatter.description || node.excerpt,
-                }}
-              />
-            </div>
+                <header>
+                  <h2>
+                    <Link to={post.fields.slug} itemProp="url">
+                      <span itemProp="headline">{title}</span>
+                    </Link>
+                  </h2>
+                  <small>
+                    {post.frontmatter.date}
+                    {` • `}
+                    {post.fields.readingTime.text}
+                  </small>
+                </header>
+                <section>
+                  <p
+                    dangerouslySetInnerHTML={{
+                      __html: post.frontmatter.description || post.excerpt,
+                    }}
+                    itemProp="description"
+                  />
+                </section>
+              </article>
+            </li>
           )
         })}
-      </Layout>
-    )
-  }
+      </ol>
+    </Layout>
+  )
 }
 
 export default BlogIndex
 
+/**
+ * Head export to define metadata for the page
+ *
+ * See: https://www.gatsbyjs.com/docs/reference/built-in-components/gatsby-head/
+ */
+export const Head = () => <Seo title="A blog by Ju Liu" />
+
 export const pageQuery = graphql`
-  query {
+  {
     site {
       siteMetadata {
         title
       }
     }
-    allMarkdownRemark(sort: { fields: [frontmatter___date], order: DESC }) {
-      edges {
-        node {
-          excerpt
-          fields {
-            slug
-            readingTime {
-              text
-            }
-          }
-          frontmatter {
-            date(formatString: "MMMM DD, YYYY")
-            title
-            description
+    allMarkdownRemark(sort: { frontmatter: { date: DESC } }) {
+      nodes {
+        excerpt
+        fields {
+          slug
+        }
+        frontmatter {
+          date(formatString: "MMMM DD, YYYY")
+          title
+          description
+        }
+        fields {
+          readingTime {
+            text
           }
         }
       }
