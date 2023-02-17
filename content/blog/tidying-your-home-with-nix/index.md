@@ -224,7 +224,7 @@ keep on reading.
 Let's go back inside `~/.config/nixpkgs` and copy our git config:
 
 ```bash
-$ cd ~/.config/nixpgs
+$ cd ~/.config/nixpkgs
 
 $ cp -L ~/.gitconfig gitconfig
 ```
@@ -304,7 +304,7 @@ shell configuration inside `home-manager`. _Yes_.
 First let's make sure we are in the right directory:
 
 ```bash
-$ cd ~/.config/nipkgs
+$ cd ~/.config/nixpkgs
 ```
 
 I'm going to show you how to do it for Bash and Zsh. You can choose one:
