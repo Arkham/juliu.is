@@ -45,7 +45,7 @@ that worked on all of my machines, even the ones which are a bit obsolete.
 
 ## Oh, but there is
 
-I've already written about [Nix](./ditch-your-version-manager), so feel
+I've already written about [Nix](/ditch-your-version-manager), so feel
 free to go and read that one first. Don't feel like it? _Fine_.
 
 Let's install it:
