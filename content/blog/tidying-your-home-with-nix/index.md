@@ -368,7 +368,7 @@ Let me show you _why_ this is VERY NICE.
 
 Let's change our `home.nix` again:
 
-```nix{28-45}
+```nix{28-39}
 { pkgs, ... }: {
   home.username = "arkham";
   home.homeDirectory = "/Users/arkham";
@@ -398,20 +398,14 @@ Let's change our `home.nix` again:
 
   programs.fzf = {
     enable = true;
-    enableBashIntegration = true;
-    enableZshIntegration = true;
   };
 
   programs.zoxide = {
     enable = true;
-    enableBashIntegration = true;
-    enableZshIntegration = true;
   };
 
   programs.direnv = {
     enable = true;
-    enableBashIntegration = true;
-    enableZshIntegration = true;
     nix-direnv.enable = true;
   };
 }
