@@ -479,7 +479,7 @@ The easiest way is to have multiple `home.nix` files, one for each machine:
   description = "Home Manager configuration";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable"
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -520,9 +520,9 @@ In your `flake.nix` do this in your `inputs` block:
   description = "Home Manager configuration";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-21.11-darwin"
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-21.11-darwin";
     home-manager = {
-      url = "github:nix-community/home-manager/release-22.11"
+      url = "github:nix-community/home-manager/release-22.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -535,7 +535,7 @@ In your `flake.nix` do this in your `inputs` block:
 
     homeConfigurations.YOUR_USER = # REPLACE ME
       home-manager.lib.homeManagerConfiguration {
-        pkgs = nixpkgs.legacyPackages.${arch}
+        pkgs = nixpkgs.legacyPackages.${arch};
         modules = [ ./home.nix ];
       };
     };
@@ -546,36 +546,36 @@ In your `flake.nix` do this in your `inputs` block:
 
 In your `flake.nix` do this:
 
-```nix{4-13,26-28}
+```nix{4-13,15,26-28}
 {
   description = "Home Manager configuration";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-21.11-darwin"
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-21.11-darwin";
     home-manager = {
-      url = "github:nix-community/home-manager/release-22.11"
+      url = "github:nix-community/home-manager/release-22.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixpkgs-unstable = {
-      url = "github:nixos/nixpkgs/nixpkgs-unstable"
-    }
+      url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    };
   };
 
-  outputs = { nixpkgs, home-manager, ... }: let
-    arch = "x86_64-darwin"; # or aarch64-darwin
-    pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
-  in {
-    defaultPackage.${arch} =
-      home-manager.defaultPackage.${arch};
+  outputs = { nixpkgs, nixpkgs-unstable, home-manager, ... }:
+    let
+      arch = "x86_64-darwin"; # or aarch64-darwin
+    in {
+      defaultPackage.${arch} =
+        home-manager.defaultPackage.${arch};
 
-    homeConfigurations.YOUR_USER = # REPLACE ME
-      home-manager.lib.homeManagerConfiguration {
-        pkgs = nixpkgs.legacyPackages.${arch}
-        modules = [ ./home.nix ];
-        extraSpecialArgs = {
-          inherit pkgs-unstable;
+      homeConfigurations.YOUR_USER = # REPLACE ME
+        home-manager.lib.homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages.${arch};
+          modules = [ ./home.nix ];
+          extraSpecialArgs = {
+            pkgs-unstable = nixpkgs-unstable.legacyPackages.${arch};
+          };
         };
-      };
     };
 }
 ```
@@ -591,9 +591,23 @@ Then in your `home.nix` you can do:
 
   home.packages = [
     pkgs.sl
-    pkgs-unstable.moon-buggy
+    pkgs-unstable.cowsay
   ];
 }
+```
+
+Now you can run:
+
+```bash
+$ cowthink "Nix is pretty neat."
+ _____________________
+( Nix is pretty neat. )
+ ---------------------
+        o   ^__^
+         o  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
 ```
 
 ### I need a config file which is unsupported. How do I symlink it into my home?
