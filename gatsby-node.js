@@ -80,6 +80,23 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
 }
 
 /**
+ * Use an in-memory webpack cache in development. The default filesystem
+ * cache gets corrupted when the dev server is killed mid-write, crashing
+ * subsequent runs with ENOENT on .cache/webpack/stage-develop/*.pack.
+ *
+ * @type {import('gatsby').GatsbyNode['onCreateWebpackConfig']}
+ */
+exports.onCreateWebpackConfig = ({ stage, actions, getConfig }) => {
+  if (stage === `develop`) {
+    // Replace (not merge) so Gatsby's filesystem-only cache options
+    // don't conflict with the memory cache
+    const config = getConfig()
+    config.cache = { type: `memory` }
+    actions.replaceWebpackConfig(config)
+  }
+}
+
+/**
  * @type {import('gatsby').GatsbyNode['createSchemaCustomization']}
  */
 exports.createSchemaCustomization = ({ actions }) => {
