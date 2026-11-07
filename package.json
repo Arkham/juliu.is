@@ -6,7 +6,7 @@
   "author": "Ju Liu",
   "license": "0BSD",
   "engines": {
-    "node": ">=20"
+    "node": ">=22.12"
   },
   "resolutions": {
     "msgpackr": "^1.11.2"

@@ -281,6 +281,15 @@ a:focus-visible {
   color: var(--color-text-light);
 }
 
+/*
+ * Posts already end with the prev/next nav, so don't stack another large gap
+ * on top of the footer boundary: 2.5rem above and 1.5rem below read as two
+ * separate voids. Match it to the footer's own padding instead.
+ */
+.global-wrapper:has(.blog-post-nav) > footer {
+  margin-top: var(--spacing-6);
+}
+
 .global-wrapper > footer a {
   color: var(--color-text-light);
   text-decoration-color: transparent;
