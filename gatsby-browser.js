@@ -12,6 +12,23 @@ import "./src/style.css"
 // Highlighting for code blocks
 import "prismjs/themes/prism-solarizedlight.css"
 
+// Full-screen overlay for images in blog posts
+import mediumZoom from "medium-zoom"
+
+let zoom
+
+/**
+ * @type {import('gatsby').GatsbyBrowser['onRouteUpdate']}
+ */
+export const onRouteUpdate = () => {
+  if (zoom) {
+    zoom.detach()
+  }
+  zoom = mediumZoom(`.blog-post .gatsby-resp-image-wrapper img`, {
+    background: `rgba(255, 255, 255, 0.95)`,
+  })
+}
+
 /**
  * Handle same-page (hash) navigations ourselves. Gatsby's scroll
  * restoration doesn't reset the scroll position when pressing the
@@ -20,8 +37,13 @@ import "prismjs/themes/prism-solarizedlight.css"
  * @type {import('gatsby').GatsbyBrowser['shouldUpdateScroll']}
  */
 export const shouldUpdateScroll = ({ routerProps, prevRouterProps }) => {
+  // Keep scroll position when closing the image overlay (location unchanged)
+  if (!prevRouterProps) {
+    return true
+  }
+
   const location = routerProps.location
-  const prevLocation = prevRouterProps && prevRouterProps.location
+  const prevLocation = prevRouterProps.location
 
   // Only customize hash-only navigations within the same page
   if (!prevLocation || prevLocation.pathname !== location.pathname) {

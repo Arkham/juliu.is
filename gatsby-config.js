@@ -40,6 +40,8 @@ module.exports = {
             resolve: `gatsby-remark-images`,
             options: {
               maxWidth: 630,
+              // Images open in a full-screen overlay instead (medium-zoom)
+              linkImagesToOriginal: false,
             },
           },
           `gatsby-remark-autolink-headers`,

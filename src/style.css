@@ -347,6 +347,14 @@ a:focus-visible {
   max-width: 100%;
 }
 
+.blog-post .gatsby-resp-image-wrapper img {
+  cursor: zoom-in;
+}
+
+.medium-zoom-image--opened {
+  cursor: zoom-out;
+}
+
 .blog-post-nav ul {
   display: flex;
   flex-wrap: wrap;
