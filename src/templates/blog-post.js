@@ -26,6 +26,12 @@ const BlogPostTemplate = ({
             {post.timeToRead} min read
           </p>
         </header>
+        {post.frontmatter.toc && (
+          <nav className="table-of-contents" aria-label="Table of contents">
+            <p className="table-of-contents-title">Contents</p>
+            <div dangerouslySetInnerHTML={{ __html: post.tableOfContents }} />
+          </nav>
+        )}
         <section
           dangerouslySetInnerHTML={{ __html: post.html }}
           itemProp="articleBody"
@@ -91,10 +97,12 @@ export const pageQuery = graphql`
       id
       excerpt(pruneLength: 160)
       html
+      tableOfContents
       frontmatter {
         title
         date(formatString: "MMMM DD, YYYY")
         description
+        toc
       }
       timeToRead
     }

@@ -32,15 +32,19 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
+  "packageManager": "yarn@1.22.22",
   "devDependencies": {
-    "eslint": "^8.57.1",
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
     "eslint-plugin-react": "^7.37.5",
+    "globals": "^17.14.0",
     "prettier": "^3.9.10"
   },
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "lint": "eslint .",
     "start": "gatsby develop",
     "serve": "gatsby serve",
     "clean": "gatsby clean",

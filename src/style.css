@@ -361,6 +361,78 @@ a:focus {
   min-width: 100%;
 }
 
+.table-of-contents {
+  margin-bottom: var(--spacing-10);
+  padding: var(--spacing-5) var(--spacing-6);
+  background: linear-gradient(to bottom right, #f7fafd, #f2f6fa);
+  border-left: 3px solid var(--color-primary);
+  border-radius: 0 6px 6px 0;
+  font-family: var(--font-heading);
+  font-size: var(--fontSize-0);
+  line-height: var(--lineHeight-relaxed);
+}
+
+.table-of-contents-title {
+  margin: 0 0 var(--spacing-3);
+  font-size: var(--fontSize-0);
+  font-weight: var(--fontWeight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-text-light);
+}
+
+.table-of-contents ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: toc;
+}
+
+.table-of-contents li {
+  margin-bottom: var(--spacing-2);
+}
+
+.table-of-contents li:last-child {
+  margin-bottom: 0;
+}
+
+/* Numbered top-level entries */
+.table-of-contents > div > ul > li {
+  counter-increment: toc;
+}
+
+.table-of-contents > div > ul > li::before {
+  content: counter(toc, decimal-leading-zero);
+  margin-right: var(--spacing-2);
+  font-weight: var(--fontWeight-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-primary);
+}
+
+/* Nested entries get a quiet dash and indent */
+.table-of-contents ul ul {
+  margin-top: var(--spacing-2);
+  margin-left: var(--spacing-4);
+}
+
+.table-of-contents ul ul li::before {
+  content: "\2013"; /* en dash */
+  margin-right: var(--spacing-2);
+  color: var(--color-accent);
+}
+
+.table-of-contents a {
+  color: var(--color-text);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.table-of-contents a:hover {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
 .gatsby-highlight code[class*="language-"],
 .blog-post code.language-text {
   font-family: Fira Mono, Consolas, Monaco, "Andale Mono", "Ubuntu Mono",

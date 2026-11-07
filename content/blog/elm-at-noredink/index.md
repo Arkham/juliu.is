@@ -2,6 +2,7 @@
 title: "Elm at NoRedInk"
 date: "2021-04-28T12:00:00.000Z"
 description: How to organize 500K lines of Elm.
+toc: true
 ---
 
 At [NoRedInk](https://www.noredink.com) we have one of the largest Elm apps
@@ -16,12 +17,6 @@ I don't think that there can ever be a comprehensive answer to that
 question, but I hope this post can be a useful reference to resources and
 techniques we've used to solve real-world problems, so you can dig deeper
 at your own leisure.
-
-## Table of contents
-
-```toc
-
-```
 
 ## A wild monorepo appears
 
