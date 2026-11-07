@@ -13,19 +13,11 @@ const Bio = () => {
         quality={95}
         alt="Profile picture"
       />
-      <div>
-        <p
-          style={{
-            marginBottom: 0,
-          }}
-        >
+      <div className="bio-text">
+        <p>
           A blog by <a href={`https://hachyderm.io/@arkham`}>Ju Liu</a>.
         </p>
-        <p
-          style={{
-            marginBottom: 0,
-          }}
-        >{`I try to write code that doesn't suck. I rarely succeed.`}</p>
+        <p>{`I try to write code that doesn't suck. I rarely succeed.`}</p>
       </div>
     </div>
   )
