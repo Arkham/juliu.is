@@ -129,7 +129,7 @@ NriProgram.domready(function () {
   const { subscribe, send } = NriProgram.mountPorts(
     Elm.Page.Teach.Classes.Main,
     "ui/src/Page/Teach/Classes/index.js",
-    "teach-classes-elm"
+    "teach-classes-elm",
   )
 
   setupReadAloud({ subscribe, send })
@@ -465,7 +465,7 @@ We write tests for our Elm code at four different layers:
 - **View tests**: here we construct a model, pass it to the view
   function and write assertions against the result using `elm-explorations/test`.
 - **Integration tests**: here we load up an auto-generated JSON file
-    (using `rails_edge_test`, find it [here](https://github.com/NoRedInk/rails_edge_test)), pass it to
+  (using `rails_edge_test`, find it [here](https://github.com/NoRedInk/rails_edge_test)), pass it to
   the `elm-program-test` program, interact with the elements on the page,
   and assert side effects.
 - **Acceptance tests**: we write these in Capybara as happy-path tests.

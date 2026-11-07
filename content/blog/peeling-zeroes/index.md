@@ -186,6 +186,7 @@ data Fin : Nat -> Type where
 
 This looks a tad different from the previous `data Nat = Z | S Nat`
 definition, but it's quite close:
+
 - We are defining a function called `Fin` that takes a natural number and returns a type.
 - One possible constructor is `FZ`, which stands for "finite zero".
 - The other constructor is `FS`, which takes an existing `Fin` and returns its successor.

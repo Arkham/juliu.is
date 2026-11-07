@@ -29,7 +29,7 @@ I can hear what you're wondering now: what about
 [Docker](https://www.docker.com/)? The idea of having a container image
 that contains all your dependencies sounds very promising indeed. The issue
 with docker images is that all those dependencies are still intertwined,
-only the whole dependency tree has become *invisible*: for example, if the
+only the whole dependency tree has become _invisible_: for example, if the
 version of Ubuntu you are using has reached its End-Of-Life, you will have
 to manually untangle all the dependencies and update everything in one go.
 If you're working on a large project with many dependencies, please do accept
@@ -143,7 +143,7 @@ $ which ruby
 ```
 
 What's with that super long path? Don't worry, it's just how Nix stores its
-data (*waves hands.. iMmUTaBIlitY*).
+data (_waves hands.. iMmUTaBIlitY_).
 
 What if we needed node?
 
@@ -264,7 +264,7 @@ $ tree
 ```
 
 The `sources.json` will contain all the dependencies that we're going to
-use.  Don't worry about the `sources.nix` file, it's mostly glue to allow
+use. Don't worry about the `sources.nix` file, it's mostly glue to allow
 us to load a JSON file in Nix.
 
 For the sake of reproducibility, change your `sources.json` to look like
@@ -272,18 +272,18 @@ this:
 
 ```json
 {
-    "nixpkgs": {
-        "branch": "release-21.05",
-        "description": "Nix Packages collection",
-        "homepage": "",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "5f244caea76105b63d826911b2a1563d33ff1cdc",
-        "sha256": "1xlgynfw9svy7nvh9nkxsxdzncv9hg99gbvbwv3gmrhmzc3sar75",
-        "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/5f244caea76105b63d826911b2a1563d33ff1cdc.tar.gz",
-        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
-    }
+  "nixpkgs": {
+    "branch": "release-21.05",
+    "description": "Nix Packages collection",
+    "homepage": "",
+    "owner": "NixOS",
+    "repo": "nixpkgs",
+    "rev": "5f244caea76105b63d826911b2a1563d33ff1cdc",
+    "sha256": "1xlgynfw9svy7nvh9nkxsxdzncv9hg99gbvbwv3gmrhmzc3sar75",
+    "type": "tarball",
+    "url": "https://github.com/NixOS/nixpkgs/archive/5f244caea76105b63d826911b2a1563d33ff1cdc.tar.gz",
+    "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+  }
 }
 ```
 

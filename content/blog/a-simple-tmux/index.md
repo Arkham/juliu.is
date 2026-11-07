@@ -188,7 +188,6 @@ bind - split-window -v -c '#{pane_current_path}'
 Use `Ctrl-a \` to open a vertical split (it's the same key with the
 `|` symbol). Use `Ctrl-a -` to open a horizontal split.
 
-
 ```bash
 bind b break-pane -d
 ```
@@ -256,6 +255,7 @@ set-option -g pane-border-style fg=colour238
 set-window-option -g window-status-format '#[bg=colour238]#[fg=colour107] #I #[bg=colour239]#[fg=colour110] #[bg=colour240]#W#[bg=colour239]#[fg=colour195]#F#[bg=colour238] '
 set-window-option -g window-status-current-format '#[bg=colour236]#[fg=colour215] #I #[bg=colour235]#[fg=colour167] #[bg=colour234]#W#[bg=colour235]#[fg=colour195]#F#[bg=colour236] '
 ```
+
 Here's a preview:
 
 ![](./status-bar.png)

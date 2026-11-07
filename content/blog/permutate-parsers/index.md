@@ -584,7 +584,6 @@ a tuple with two values:
    parsers can keep parsing the rest of the input.
 2. The second value contains either a parse error or a properly parsed value of type `a`.
 
-
 We'll need to install `parsec` and add some imports:
 
 ```haskell
@@ -810,9 +809,9 @@ import Text.Parsec.Perm (permute, (<$$>), (<|?>), (<||>))
 Woah, calm down, that's lots of operators there mate.
 
 - `permute` is the last call that will wrap everything up and return a
-    parser of something.
+  parser of something.
 - `<$$>` is used to assign all the fields that we parsed to something. In
-    our case it will be a `Passport`.
+  our case it will be a `Passport`.
 - `<||>` is used to describe a required field
 - `<|?>` is used to describe an optional field
 

@@ -27,7 +27,7 @@ and [burritos](https://blog.plover.com/prog/burritos.html) out there.
 Let's start with something that's used all the time. If two things are
 isomorphic, it means that _for all intents and purposes they are the same_.
 Anytime you read _isomorphic_, just read _more or less the same for what we
-care about_. 
+care about_.
 
 This should be enough information for you to get on with your day. You can
 close the tab now. Thanks for reading!

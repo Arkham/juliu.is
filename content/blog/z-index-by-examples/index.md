@@ -179,7 +179,7 @@ with the big boys. Now, it can only affect stacking within the blue box.
 
 This is a great cause of frustration. No matter how high you set a
 `z-index` property, you will _never_ be able to 'escape' the parent
-stacking context.  And every time you are struggling with making `z-index`
+stacking context. And every time you are struggling with making `z-index`
 work you can bet that it's because _something_ created a stacking context
 that you can't escape from.
 
@@ -204,7 +204,7 @@ list of usual suspects.
 
 ![opacity](./opacity.png)
 
-[Transform and filter effects](https://z-index.juliu.is/?css=p%2Btransform%3A%20rotate(30deg))
+[Transform and filter effects](<https://z-index.juliu.is/?css=p%2Btransform%3A%20rotate(30deg)>)
 
 ![transform](./transform.png)
 

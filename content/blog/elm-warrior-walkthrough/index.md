@@ -24,7 +24,9 @@ you're just starting out.
 Before we begin, a word of warning...
 
 ## SPOILERS AHEAD!
+
 ## SPOILERS AHEAD!!
+
 ## SPOILERS AHEAD!!!
 
 Now that my conscience is clear, I'll start by copying the exposed values
@@ -726,7 +728,7 @@ isBadlyWounded warrior =
     Warrior.health warrior < Warrior.maxHealth warrior // 4
 ```
 
-Now, we're going to replace `isWounded` inside `exploreDirection`.  We
+Now, we're going to replace `isWounded` inside `exploreDirection`. We
 still want the original function inside `takeTurn` because we want to heal
 back to full health when we're safe.
 
