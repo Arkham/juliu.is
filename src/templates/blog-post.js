@@ -23,7 +23,7 @@ const BlogPostTemplate = ({
           <p>
             {post.frontmatter.date}
             {` • `}
-            {post.fields.readingTime.text}
+            {post.timeToRead} min read
           </p>
         </header>
         <section
@@ -96,11 +96,7 @@ export const pageQuery = graphql`
         date(formatString: "MMMM DD, YYYY")
         description
       }
-      fields {
-        readingTime {
-          text
-        }
-      }
+      timeToRead
     }
     previous: markdownRemark(id: { eq: $previousPostId }) {
       fields {

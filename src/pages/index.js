@@ -32,7 +32,7 @@ const BlogIndex = ({ data, location }) => {
                   <small>
                     {post.frontmatter.date}
                     {` • `}
-                    {post.fields.readingTime.text}
+                    {post.timeToRead} min read
                   </small>
                 </header>
                 <section>
@@ -71,6 +71,7 @@ export const pageQuery = graphql`
     allMarkdownRemark(sort: { frontmatter: { date: DESC } }) {
       nodes {
         excerpt
+        timeToRead
         fields {
           slug
         }
@@ -78,11 +79,6 @@ export const pageQuery = graphql`
           date(formatString: "MMMM DD, YYYY")
           title
           description
-        }
-        fields {
-          readingTime {
-            text
-          }
         }
       }
     }
