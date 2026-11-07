@@ -25,6 +25,12 @@ const Layout = ({ location, title, children }) => {
       <header className="global-header">{header}</header>
       <main>{children}</main>
       <footer>
+        {!isRootPath && (
+          <>
+            <Link to="/">home</Link>
+            {` • `}
+          </>
+        )}
         <a href="https://hachyderm.io/@arkham">mastodon</a>
         {` • `}
         <a href="https://twitter.com/arkh4m">birdsite</a>

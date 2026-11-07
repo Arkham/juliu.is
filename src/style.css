@@ -59,6 +59,7 @@
   --color-heading: #1a202c;
   --color-heading-black: black;
   --color-accent: #d1dce5;
+  --color-border: #b6c6d3;
 }
 
 /* HTML elements */
@@ -263,11 +264,11 @@ a:focus-visible {
 }
 
 .global-wrapper[data-is-root-path="true"] .bio {
-  margin-bottom: var(--spacing-12);
+  margin-bottom: var(--spacing-16);
 }
 
 .global-header {
-  margin-bottom: var(--spacing-8);
+  margin-bottom: var(--spacing-10);
 }
 
 .global-wrapper > footer {
@@ -303,9 +304,9 @@ a:focus-visible {
 
 .post-list-item {
   margin: var(--spacing-0);
-  padding-bottom: var(--spacing-6);
-  margin-bottom: var(--spacing-6);
-  border-bottom: 1px solid var(--color-accent);
+  padding-bottom: var(--spacing-8);
+  margin-bottom: var(--spacing-8);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .post-list-item:last-child {
@@ -321,12 +322,12 @@ a:focus-visible {
 .post-list-item h2 {
   font-size: var(--fontSize-4);
   color: var(--color-primary);
-  margin-bottom: var(--spacing-1);
   margin-top: var(--spacing-0);
+  margin-bottom: calc(var(--spacing-1) * 1.5);
 }
 
 .post-list-item header {
-  margin-bottom: var(--spacing-1);
+  margin-bottom: var(--spacing-2);
 }
 
 .post-list-item header small {
@@ -356,12 +357,14 @@ a:focus-visible {
   font-family: var(--font-heading);
   text-decoration: none;
   font-size: var(--fontSize-3);
-  color: var(--color-heading-black);
+  color: var(--color-primary);
 }
 
 .header-link-home:hover {
-  color: var(--color-primary);
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
 }
 
 /* 404 */
