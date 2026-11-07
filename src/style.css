@@ -445,8 +445,39 @@ a:focus-visible {
   cursor: zoom-in;
 }
 
-.medium-zoom-image--opened {
+/* Image zoom overlay (medium-zoom, pure build) */
+.medium-zoom-overlay {
+  position: fixed;
+  inset: 0;
+  opacity: 0;
+  will-change: opacity;
+  transition: opacity 160ms ease-out;
+}
+
+.medium-zoom--opened .medium-zoom-overlay {
+  opacity: 1;
   cursor: zoom-out;
+}
+
+.medium-zoom-image {
+  transition: transform 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.medium-zoom-image--hidden {
+  visibility: hidden;
+}
+
+.medium-zoom-image--opened {
+  position: relative;
+  will-change: transform;
+  cursor: zoom-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .medium-zoom-image,
+  .medium-zoom-overlay {
+    transition: none;
+  }
 }
 
 .blog-post-nav {

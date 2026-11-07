@@ -13,7 +13,8 @@ import "./src/style.css"
 import "prismjs/themes/prism-solarizedlight.css"
 
 // Full-screen overlay for images in blog posts
-import mediumZoom from "medium-zoom"
+// (using the "pure" build so the zoom animation is styled in style.css)
+import mediumZoom from "medium-zoom/dist/pure"
 
 let zoom
 
