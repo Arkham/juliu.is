@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: true
+  GATSBY_TELEMETRY_DISABLED: 1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --prefer-offline
+
+      # Gatsby's incremental build cache: `.cache` holds the page/query store
+      # and transformed images, `public/static` holds the already-processed
+      # image files. Keyed on the lockfile and Gatsby config so a dependency
+      # or plugin change starts cold; the trailing `-` restore-key lets each
+      # commit seed from the newest previous build (Gatsby validates the
+      # cache itself and rebuilds what it cannot reuse).
+      - name: Restore Gatsby build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .cache
+            public
+          key: gatsby-${{ runner.os }}-${{ hashFiles('yarn.lock', 'gatsby-config.js', 'gatsby-node.js') }}-${{ github.sha }}
+          restore-keys: |
+            gatsby-${{ runner.os }}-${{ hashFiles('yarn.lock', 'gatsby-config.js', 'gatsby-node.js') }}-
+            gatsby-${{ runner.os }}-
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Check formatting
+        run: yarn format:check
+
+      - name: Build
+        run: yarn build
