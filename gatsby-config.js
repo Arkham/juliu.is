@@ -43,7 +43,13 @@ module.exports = {
             },
           },
           `gatsby-remark-autolink-headers`,
-          `gatsby-remark-prismjs`,
+          {
+            resolve: `gatsby-remark-prismjs`,
+            options: {
+              // Posts use ```lang{1,2-3} fences to highlight lines
+              highlightLines: true,
+            },
+          },
           `gatsby-remark-smartypants`,
         ],
       },
@@ -58,7 +64,7 @@ module.exports = {
         start_url: `/`,
         background_color: `#ffffff`,
         theme_color: `#007acc`,
-        display: `minimal-ui`,
+        display: `standalone`,
         icon: `src/images/icon.png`,
       },
     },
